@@ -1,0 +1,43 @@
+#include "Reflect.h"
+
+namespace reflect {
+
+	// A type descriptor for int
+	class TypeDescriptor_Int : public TypeDescriptor
+	{
+	public:
+		TypeDescriptor_Int() : TypeDescriptor("int", sizeof(int)){}
+
+		virtual void Dump(const void* _obj, int /* unused */) const override
+		{
+			std::cout << "int{" << *(const int*)_obj << "}";
+		}
+	};
+
+	template <>
+	TypeDescriptor* GetPrimitiveDescriptor<int>()
+	{
+		static TypeDescriptor_Int typeDesc;
+		return &typeDesc;
+	}
+
+	// A type descriptor for std::string
+	class TypeDescriptor_StdString : public TypeDescriptor
+	{
+	public:
+		TypeDescriptor_StdString() :TypeDescriptor("std::string", sizeof(std::string)) {}
+		
+		virtual void Dump(const void* _obj, int /* unused */) const override
+		{
+			std::cout << "std::string{" << *(const std::string*)_obj << "}";
+		}
+	};
+
+	template <>
+	TypeDescriptor* GetPrimitiveDescriptor<std::string>()
+	{
+		static TypeDescriptor_StdString typeDesc;
+		return &typeDesc;
+	}
+
+} // namespace reflect

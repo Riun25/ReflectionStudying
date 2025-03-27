@@ -17,7 +17,7 @@ namespace reflect
 		virtual std::string GetFullName() const { return name; }
 		virtual void Dump(const void* _obj, int _indentLevel = 0) const = 0;
 
-	public: 
+	public:
 		const char* name;
 		size_t size;
 	};
@@ -69,6 +69,14 @@ namespace reflect
 			TypeDescriptor* type;
 		};
 
+		struct Function
+		{
+			const char* name;
+			const char* returnType;
+			std::vector<const char*> parameterTypes;
+		};
+
+
 	public:
 		TypeDescriptor_SubClass(void (*init)(TypeDescriptor_SubClass*)) : TypeDescriptor(nullptr, 0)
 		{
@@ -80,17 +88,31 @@ namespace reflect
 		virtual void Dump(const void* _obj, int _indentLevel) const override
 		{
 			std::cout << name << "\n" << std::string(4 * _indentLevel, ' ') << "{\n";
+
 			for (const Member& member : memberVec)
 			{
 				std::cout << std::string(4 * (_indentLevel + 1), ' ') << member.name << " = ";
 				member.type->Dump((char*)_obj + member.offset, _indentLevel + 1);
 				std::cout << "\n";
 			}
-			std::cout << std::string(4 * _indentLevel, ' ') << "}";
+
+			for (const Function& eFunction : functionVec)
+			{
+				std::cout << std::string(4 * (_indentLevel + 1), ' ') << "Function: " << eFunction.name
+					<< " -> Return Type: " << eFunction.returnType << ", Parameters: (";
+				for (const char* paramType : eFunction.parameterTypes)
+				{
+					std::cout << paramType << " ";
+				}
+				std::cout << ")\n";
+			}
+
+			std::cout << std::string(4 * _indentLevel, ' ') << "}\n";
 		}
 
 	public:
 		std::vector<Member> memberVec;
+		std::vector<Function> functionVec;
 	};
 
 #define REFLECT() \
@@ -98,22 +120,40 @@ namespace reflect
 	static reflect::TypeDescriptor_SubClass Reflection; \
 	static void initReflection(reflect::TypeDescriptor_SubClass*);
 
-#define REFLECT_STRUCT_BEGIN(_type)\
-	reflect::TypeDescriptor_SubClass _type::Reflection{ _type::initReflection }; \
-	void _type::initReflection(reflect::TypeDescriptor_SubClass* _typeDesc) \
-	{ \
-		using T = _type; \
-		_typeDesc->name = #_type; \
-		_typeDesc->size = sizeof(T); \
-		_typeDesc->memberVec = \
-		{ 
+#define REFLECT_STRUCT_BEGIN(_type) \
+    reflect::TypeDescriptor_SubClass _type::Reflection{ _type::initReflection }; \
+    void _type::initReflection(reflect::TypeDescriptor_SubClass* _typeDesc) \
+    { \
+        using T = _type; \
+        _typeDesc->name = #_type; \
+        _typeDesc->size = sizeof(T); \
+        _typeDesc->memberVec.clear();
+
+#define REFLECT_MEMBER_START() \
+        _typeDesc->memberVec = \
+        {
 
 #define REFLECT_STRUCT_MEMBER(_name) \
-			{#_name, offsetof(T, _name), reflect::TTypeResolver<decltype(T::_name)>::Get()},
+            {#_name, offsetof(T, _name), reflect::TTypeResolver<decltype(T::_name)>::Get()}, 
 
-#define REFLECT_STRUCT_END() \
-		}; \
-	}
+#define REFLECT_MEMBER_END() \
+        };
+
+#define REFLECT_FUNCTION_START() \
+        static bool initialized = false; \
+        if (!initialized) { \
+            initialized = true; \
+            _typeDesc->functionVec.clear(); \
+            _typeDesc->functionVec = \
+            {
+
+#define REFLECT_STRUCT_FUNCTION(_name, _returnType, ...) \
+                {#_name, #_returnType, {#__VA_ARGS__}},
+
+#define REFLECT_STRUCT_FUNCTION_END() \
+            }; \
+        } \
+    }
 
 	class TypeDescriptor_StdVector : public TypeDescriptor
 	{

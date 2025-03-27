@@ -18,13 +18,19 @@
     <ClCompile Include="Main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Primitives.cpp">
+    <ClCompile Include="Reflection\Primitives.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GarbageCollection\GCCollector.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Reflect.h">
+    <ClInclude Include="Reflection\Reflect.h">
       <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GarbageCollection\GCCollector.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

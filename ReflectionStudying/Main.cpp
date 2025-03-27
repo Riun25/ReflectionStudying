@@ -1,5 +1,6 @@
 #include <vector>
-#include "Reflect.h"
+#include "Reflection/Reflect.h"
+#include "GarbageCollection/GCCollector.h"
 
 struct Node
 {
@@ -24,6 +25,7 @@ struct MyStruct
 
 int main()
 {
+	/*{ // 기본 reflection에 대한 테스트
 	//오브젝트 생성
 	Node node =
 	{
@@ -39,23 +41,57 @@ int main()
 	MyStruct myS;
 	reflect::TypeDescriptor* typeDesc2 = reflect::TTypeResolver<MyStruct>::Get();
 	typeDesc2->Dump(&myS);
+	}*/ 
+
+	/*{ // 기본 GC에 대한 테스트
+	GC::GarbageCollector gc;
+
+    // 루트 객체 생성
+	GC::Object* root1 = gc.CreateObject();
+	GC::Object* root2 = gc.CreateObject();
+	gc.AddRoot(root1);
+	gc.AddRoot(root2);
+
+    // 자식 객체 생성 및 참조 추가
+	GC::Object* child1 = gc.CreateObject();
+    root1->AddReference(child1);
+
+	GC::Object* child2 = gc.CreateObject();
+    child1->AddReference(child2);
+
+	GC::Object* child3 = gc.CreateObject();
+    root2->AddReference(child3);
+
+    // 자식의 자식 생성
+	GC::Object* grandchild = gc.CreateObject();
+    child3->AddReference(grandchild);
+
+    // Garbage Collection 실행 전 상태 출력
+    std::cout << "\n--- Before Garbage Collection ---\n";
+
+    // 첫 번째 가비지 컬렉션 실행
+    gc.Collect();
+
+    // 특정 참조 제거 (루트에서 child3 연결 끊기)
+    root2->references.clear();
+    std::cout << "\n--- After Clearing References from Root2 ---\n";
+
+    // 두 번째 가비지 컬렉션 실행
+    gc.Collect();
+	}*/ 
 
 	return 0;
 }
 
 // 노드 타입에 대한 정의를 나타내는 매크로
 REFLECT_STRUCT_BEGIN(Node)
-REFLECT_MEMBER_START()
 REFLECT_STRUCT_MEMBER(key)
 REFLECT_STRUCT_MEMBER(value)
 REFLECT_STRUCT_MEMBER(children)
-REFLECT_MEMBER_END()
-REFLECT_FUNCTION_START()
 REFLECT_STRUCT_FUNCTION(Print, void)
 REFLECT_STRUCT_FUNCTION(Add, int, int, int)
-REFLECT_STRUCT_FUNCTION_END()
+REFLECT_STRUCT_END()
 
 REFLECT_STRUCT_BEGIN(MyStruct)
-REFLECT_FUNCTION_START()
 REFLECT_STRUCT_FUNCTION(Print, void)
-REFLECT_STRUCT_FUNCTION_END()
+REFLECT_STRUCT_END()

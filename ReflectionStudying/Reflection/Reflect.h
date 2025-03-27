@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <vector>
 #include <type_traits>
+#include <unordered_set>
 
 namespace reflect
 {
@@ -16,6 +17,7 @@ namespace reflect
 	public:
 		virtual std::string GetFullName() const { return name; }
 		virtual void Dump(const void* _obj, int _indentLevel = 0) const = 0;
+		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const = 0;
 
 	public:
 		const char* name;
@@ -110,6 +112,21 @@ namespace reflect
 			std::cout << std::string(4 * _indentLevel, ' ') << "}\n";
 		}
 
+		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const override
+		{
+			if (_markedObjects.find(_obj) != _markedObjects.end())
+			{
+				return;
+			}
+			_markedObjects.insert(_obj);
+			
+			for (const Member& member : memberVec)
+			{
+				const void* memberPtr = (char*)_obj + member.offset;
+				member.type->Mark(_obj, _markedObjects);
+			}
+		}
+
 	public:
 		std::vector<Member> memberVec;
 		std::vector<Function> functionVec;
@@ -127,32 +144,16 @@ namespace reflect
         using T = _type; \
         _typeDesc->name = #_type; \
         _typeDesc->size = sizeof(T); \
-        _typeDesc->memberVec.clear();
-
-#define REFLECT_MEMBER_START() \
-        _typeDesc->memberVec = \
-        {
+        _typeDesc->memberVec.clear(); \
+        _typeDesc->functionVec.clear();
 
 #define REFLECT_STRUCT_MEMBER(_name) \
-            {#_name, offsetof(T, _name), reflect::TTypeResolver<decltype(T::_name)>::Get()}, 
-
-#define REFLECT_MEMBER_END() \
-        };
-
-#define REFLECT_FUNCTION_START() \
-        static bool initialized = false; \
-        if (!initialized) { \
-            initialized = true; \
-            _typeDesc->functionVec.clear(); \
-            _typeDesc->functionVec = \
-            {
+        _typeDesc->memberVec.push_back({#_name, offsetof(T, _name), reflect::TTypeResolver<decltype(T::_name)>::Get()});
 
 #define REFLECT_STRUCT_FUNCTION(_name, _returnType, ...) \
-                {#_name, #_returnType, {#__VA_ARGS__}},
+        _typeDesc->functionVec.push_back({#_name, #_returnType, {#__VA_ARGS__}});
 
-#define REFLECT_STRUCT_FUNCTION_END() \
-            }; \
-        } \
+#define REFLECT_STRUCT_END() \
     }
 
 	class TypeDescriptor_StdVector : public TypeDescriptor
@@ -186,6 +187,16 @@ namespace reflect
 					std::cout << "\n";
 				}
 				std::cout << std::string(4 * _indentLevel, ' ') << "}";
+			}
+		}
+
+		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const override
+		{
+			size_t numItems = GetSize(_obj);
+			for (size_t i = 0; i < numItems; ++i)
+			{
+				const void* item = GetItem(_obj, i);
+				itemType->Mark(_obj, _markedObjects);
 			}
 		}
 

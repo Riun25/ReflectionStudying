@@ -128,11 +128,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GarbageCollection\GCCollector.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Primitives.cpp" />
+    <ClCompile Include="Reflection\Primitives.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Reflect.h" />
+    <ClInclude Include="GarbageCollection\GCCollector.h" />
+    <ClInclude Include="Reflection\Reflect.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

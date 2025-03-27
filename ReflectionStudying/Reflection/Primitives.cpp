@@ -12,6 +12,9 @@ namespace reflect {
 		{
 			std::cout << "int{" << *(const int*)_obj << "}";
 		}
+
+		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
+		{ }
 	};
 
 	template <>
@@ -30,6 +33,10 @@ namespace reflect {
 		virtual void Dump(const void* _obj, int /* unused */) const override
 		{
 			std::cout << "std::string{" << *(const std::string*)_obj << "}";
+		}
+
+		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
+		{
 		}
 	};
 

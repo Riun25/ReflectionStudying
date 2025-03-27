@@ -3,9 +3,12 @@
 #include <vector>
 #include <iostream>
 
+struct Node;
+class reflect::TypeDescriptor;
+
 namespace GC
 {
-	class Object
+	/*class Object
 	{
 	public:
 		bool marked = false;
@@ -22,7 +25,7 @@ namespace GC
 			references.push_back(_obj);
 			std::cout << "Object" << this->id << " now references Object " << _obj->id <<"\n";
 		}
-	};
+	};*/
 
 	class GarbageCollector
 	{
@@ -31,24 +34,27 @@ namespace GC
 		~GarbageCollector() {}
 
 	public:
-		// 오브젝트 생성
-		Object* CreateObject();
+		// 할당
+		void Allocate(void* _obj);
 
 		// 루트에 추가
-		void AddRoot(Object* _obj);
+		void AddRoot(void* _obj);
+
+		// 루트 벡터 초기화
+		void ClearRoots();
 
 		// 마킹
-		void mark(Object* _obj);
+		void Mark(reflect::TypeDescriptor* _typeDesc);
 
 		// 스윕
-		void Sweep();
+		void Sweep(reflect::TypeDescriptor* _typeDesc);
 
 		// 콜렉트
-		void Collect();
+		void Collect(reflect::TypeDescriptor* _typeDesc);
 
 	private:
-		std::unordered_set<Object*> heap;
-		std::vector<Object*> roots;
-		uint32_t nextID = 0;
+		std::unordered_set<void*> heap;
+		std::vector<void*> roots;
+		std::unordered_set<const void*> markedObjects;
 	};
 }

@@ -80,6 +80,36 @@ int main()
     gc.Collect();
 	}*/ 
 
+	GC::GarbageCollector gc;
+	// Node 타입에 대한 리플렉션 초기화
+	reflect::TypeDescriptor* typeDesc = reflect::TTypeResolver<Node>::Get();
+	// Node 객체 생성 및 설정
+	Node* node = new Node{ "apple", 3, {} };
+	Node* child1 = new Node{ "pineapple", 5, {} };
+	Node* child2 = new Node{ "banana", 7, {} };
+
+	node->children.push_back(*child1);
+	node->children.push_back(*child2);
+
+	gc.AddRoot(node);      // 루트로 등록
+	gc.Allocate(node);     // 힙에 추가
+	gc.Allocate(child1);   // 자식 노드를 힙에 추가
+	gc.Allocate(child2);   // 자식 노드를 힙에 추가
+
+	// 첫 번째 GC 실행 전 상태 출력
+	std::cout << "--- Before Garbage Collection ---\n";
+	typeDesc->Dump(node); // 디스크립터를 사용하여 노드 덤프 출력
+
+	gc.Collect(typeDesc); // 첫 번째 GC 실행
+
+	// 참조 제거 후 GC 실행
+	node->children.clear();   // 자식 참조 제거 -> "pineapple"과 "banana" unreachable 상태로 만듦
+	gc.ClearRoots();          // 루트를 비워서 node도 unreachable 상태로 만듦
+
+	std::cout << "\n--- After Clearing References ---\n";
+
+	gc.Collect(typeDesc); // 두 번째 GC 실행
+
 	return 0;
 }
 

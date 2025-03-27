@@ -114,6 +114,11 @@ namespace reflect
 
 		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const override
 		{
+			if (_obj == nullptr)
+			{
+				return;
+			}
+
 			if (_markedObjects.find(_obj) != _markedObjects.end())
 			{
 				return;
@@ -122,8 +127,9 @@ namespace reflect
 			
 			for (const Member& member : memberVec)
 			{
+				// std::cout << "Marking object: " << (char*)_obj << "\n"; µð¹ö±ë¿ë
 				const void* memberPtr = (char*)_obj + member.offset;
-				member.type->Mark(_obj, _markedObjects);
+				member.type->Mark(memberPtr, _markedObjects);
 			}
 		}
 
@@ -196,7 +202,7 @@ namespace reflect
 			for (size_t i = 0; i < numItems; ++i)
 			{
 				const void* item = GetItem(_obj, i);
-				itemType->Mark(_obj, _markedObjects);
+				itemType->Mark(item, _markedObjects);
 			}
 		}
 

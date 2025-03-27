@@ -1,59 +1,56 @@
+#include "../Reflection/Reflect.h"
 #include "GCCollector.h"
 
-GC::Object* GC::GarbageCollector::CreateObject()
+void GC::GarbageCollector::Allocate(void* _obj)
 {
-    Object* obj = new Object(nextID++);
-    heap.insert(obj);
-    std::cout << "Created Object " << obj->id << "\n";
-    return obj;
+    heap.insert(_obj);
 }
 
-void GC::GarbageCollector::AddRoot(Object* _obj)
+void GC::GarbageCollector::AddRoot(void* _root)
 {
-    roots.push_back(_obj);
-    std::cout << "Object " << _obj->id << " added as a root.\n";
+    roots.push_back(_root);
+    std::cout << "Object added as a root.\n";
 }
 
-void GC::GarbageCollector::mark(Object* _obj)
+void GC::GarbageCollector::ClearRoots()
 {
-    if (_obj == nullptr || _obj->marked == true)
+    roots.clear();
+}
+
+void GC::GarbageCollector::Mark(reflect::TypeDescriptor* _typeDesc)
+{
+	std::cout << "\nStarting Marking...\n";
+
+    for (void* root : roots)
     {
-        return;
-    }
-    _obj->marked = true;
-    std::cout << "Marked Object " << _obj->id << "\n";
-    for (Object* ref : _obj->references)
-    {
-        mark(ref);
+        _typeDesc->Mark(root, markedObjects);
     }
 }
 
-void GC::GarbageCollector::Sweep()
+void GC::GarbageCollector::Sweep(reflect::TypeDescriptor* _typeDesc)
 {
-    std::cout << "Sweeping...\n";
+    std::cout << "\nStarting Sweeping...\n";
     for (auto it = heap.begin(); it != heap.end();)
     {
-        if ((*it)->marked == false)
+        if (markedObjects.find(*it) == markedObjects.end()) // 마킹되지 않은 경우 삭제
         {
-            std::cout << "Deleting Object " << (*it)->id << "\n";
-            delete* it;
+            std::cout << "Collecting: " << *it << "\n";
+            //delete static_cast<_typeDesc.name>(*it); TODO :: 읽어온 클래스 이름으로 대체할 것
+            delete static_cast<Node*>(*it);
             it = heap.erase(it);
         }
         else
         {
-            (*it)->marked = false;
             ++it;
         }
     }
+    markedObjects.clear(); // 다음 GC를 위해 초기화
 }
 
-void GC::GarbageCollector::Collect()
+void GC::GarbageCollector::Collect(reflect::TypeDescriptor* _typeDesc)
 {
     std::cout << "\nStarting Garbage Collection...\n";
-    for (Object* root : roots)
-    {
-        mark(root);
-    }
-    Sweep();
+    Mark(_typeDesc);
+    Sweep(_typeDesc);
     std::cout << "Garbage Collection Complete.\n\n";
 }

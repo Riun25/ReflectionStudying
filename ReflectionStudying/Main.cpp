@@ -83,18 +83,19 @@ int main()
 	GC::GarbageCollector gc;
 	// Node 타입에 대한 리플렉션 초기화
 	reflect::TypeDescriptor* typeDesc = reflect::TTypeResolver<Node>::Get();
-	// Node 객체 생성 및 설정
-	Node* node = new Node{ "apple", 3, {} };
-	Node* child1 = new Node{ "pineapple", 5, {} };
-	Node* child2 = new Node{ "banana", 7, {} };
 
-	node->children.push_back(*child1);
-	node->children.push_back(*child2);
+	Node* node = new Node
+	{
+		"apple", 3,	{{"pineapple", 5, {}}, {"banana", 7, {}}}
+	};
 
 	gc.AddRoot(node);      // 루트로 등록
 	gc.Allocate(node);     // 힙에 추가
-	gc.Allocate(child1);   // 자식 노드를 힙에 추가
-	gc.Allocate(child2);   // 자식 노드를 힙에 추가
+
+	for (Node& child : node->children) 
+	{
+		gc.Allocate(&child);
+	}
 
 	// 첫 번째 GC 실행 전 상태 출력
 	std::cout << "--- Before Garbage Collection ---\n";

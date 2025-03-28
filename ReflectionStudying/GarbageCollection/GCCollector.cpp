@@ -36,7 +36,7 @@ void GC::GarbageCollector::Sweep(reflect::TypeDescriptor* _typeDesc)
         {
             std::cout << "Collecting: " << *it << "\n";
             //delete static_cast<_typeDesc.name>(*it); TODO :: 읽어온 클래스 이름으로 대체할 것
-            delete static_cast<Node*>(*it);
+            _typeDesc->Delete(*it);
             it = heap.erase(it);
         }
         else

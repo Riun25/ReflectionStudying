@@ -18,6 +18,7 @@ namespace reflect
 		virtual std::string GetFullName() const { return name; }
 		virtual void Dump(const void* _obj, int _indentLevel = 0) const = 0;
 		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const = 0;
+		virtual void Delete(void* _obj) const = 0;
 
 	public:
 		const char* name;
@@ -133,6 +134,22 @@ namespace reflect
 			}
 		}
 
+		virtual void Delete(void* _obj) const override
+		{
+			if (_obj == nullptr)
+			{
+				return;
+			}
+
+			// 멤버 변수 삭제
+			for (const Member& member : memberVec) 
+			{
+				void* memberPtr = (char*)_obj + member.offset;
+				member.type->Delete(memberPtr);  // 멤버의 타입 정보를 사용해 삭제
+			}
+		}
+
+
 	public:
 		std::vector<Member> memberVec;
 		std::vector<Function> functionVec;
@@ -203,6 +220,21 @@ namespace reflect
 			{
 				const void* item = GetItem(_obj, i);
 				itemType->Mark(item, _markedObjects);
+			}
+		}
+
+		virtual void Delete(void* _obj) const override
+		{
+			if (_obj == nullptr) 
+			{
+				return;
+			}
+
+			size_t numItems = GetSize(_obj);
+			for (size_t i = 0; i < numItems; ++i)
+			{
+				const void* item = GetItem(_obj, i);
+				itemType->Delete(const_cast<void*>(item));
 			}
 		}
 

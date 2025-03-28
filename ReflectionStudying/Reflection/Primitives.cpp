@@ -15,6 +15,9 @@ namespace reflect {
 
 		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
 		{ }
+
+		virtual void Delete(void* _obj) const override
+		{ }
 	};
 
 	template <>
@@ -36,8 +39,10 @@ namespace reflect {
 		}
 
 		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
-		{
-		}
+		{ }
+
+		virtual void Delete(void* _obj) const override
+		{ }
 	};
 
 	template <>

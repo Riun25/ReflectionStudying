@@ -134,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GarbageCollection\GCCollector.h" />
+    <ClInclude Include="Node.h" />
     <ClInclude Include="Reflection\Reflect.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

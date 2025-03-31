@@ -38,7 +38,10 @@ namespace GC
 		void Allocate(void* _obj);
 
 		// 루트에 추가
-		void AddRoot(void* _obj);
+		void AddRoot(void* _root);
+
+		// 루트에서 삭제
+		void RemoveRoot(void* _root);
 
 		// 루트 벡터 초기화
 		void ClearRoots();

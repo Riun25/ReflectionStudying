@@ -22,12 +22,12 @@ struct MyStruct
 	REFLECT()
 };
 
-Node* CreateRandomGraph(GC::GarbageCollector& _gc, int numNodes)
+Node* CreateRandomGraph(GC::GarbageCollector& _gc, int _numNodes)
 {
 	std::vector<Node*> nodes;
 
 	// 랜덤 노드 생성
-	for (int i = 0; i < numNodes; ++i)
+	for (int i = 0; i < _numNodes; ++i)
 	{
 		nodes.push_back(new Node{ "Node_" + std::to_string(i), i, {} });
 		_gc.Allocate(nodes.back()); // 모든 노드를 GC에 등록
@@ -36,7 +36,7 @@ Node* CreateRandomGraph(GC::GarbageCollector& _gc, int numNodes)
 	// 랜덤 연결 설정
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dist(0, numNodes - 1);
+	std::uniform_int_distribution<> dist(0, _numNodes - 1);
 
 	for (Node* node : nodes)
 	{

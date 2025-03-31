@@ -8,8 +8,31 @@ void GC::GarbageCollector::Allocate(void* _obj)
 
 void GC::GarbageCollector::AddRoot(void* _root)
 {
-    roots.push_back(_root);
-    std::cout << "Object added as a root.\n";
+	if (std::find(roots.begin(), roots.end(), _root) == roots.end()) 
+    {
+		roots.push_back(_root);
+		static_cast<reflect::TypeDescriptor_SubClass*>(_root)->IncrementReference();
+		std::cout << "Object added as a root.\n";
+	}
+	else 
+    {
+		std::cout << "Object is already a root.\n";
+	}
+}
+
+void GC::GarbageCollector::RemoveRoot(void* _root)
+{
+    auto it = std::find(roots.begin(), roots.end(), _root);
+    if (it != roots.end())
+    {
+        roots.erase(it);
+    	static_cast<reflect::TypeDescriptor_SubClass*>(_root)->DecrementReference();
+	    std::cout << "Object removed as a root.\n";
+    }
+    else
+    {
+        std::cout << "Object not found in roots.\n";
+    }
 }
 
 void GC::GarbageCollector::ClearRoots()
@@ -19,7 +42,7 @@ void GC::GarbageCollector::ClearRoots()
 
 void GC::GarbageCollector::Mark(reflect::TypeDescriptor* _typeDesc)
 {
-	std::cout << "\nStarting Marking...\n";
+    /// [성능측정] std::cout << "\nStarting Marking...\n";
 
     for (void* root : roots)
     {
@@ -29,13 +52,13 @@ void GC::GarbageCollector::Mark(reflect::TypeDescriptor* _typeDesc)
 
 void GC::GarbageCollector::Sweep(reflect::TypeDescriptor* _typeDesc)
 {
-    std::cout << "\nStarting Sweeping...\n";
+    /// [성능측정]std::cout << "\nStarting Sweeping...\n";
     for (auto it = heap.begin(); it != heap.end();)
     {
-        if (markedObjects.find(*it) == markedObjects.end()) // 마킹되지 않은 경우 삭제
+        auto* obj = static_cast<reflect::TypeDescriptor_SubClass*>(*it);
+        if (markedObjects.find(*it) == markedObjects.end() && obj->GetReferenceCount() == 0) // 마킹되지 않은 경우 삭제
         {
             std::cout << "Collecting: " << *it << "\n";
-            //delete static_cast<_typeDesc.name>(*it); TODO :: 읽어온 클래스 이름으로 대체할 것
             _typeDesc->Delete(*it);
             it = heap.erase(it);
         }
@@ -49,8 +72,8 @@ void GC::GarbageCollector::Sweep(reflect::TypeDescriptor* _typeDesc)
 
 void GC::GarbageCollector::Collect(reflect::TypeDescriptor* _typeDesc)
 {
-    std::cout << "\nStarting Garbage Collection...\n";
+    /// [성능측정] std::cout << "\nStarting Garbage Collection...\n";
     Mark(_typeDesc);
     Sweep(_typeDesc);
-    std::cout << "Garbage Collection Complete.\n\n";
+    /// [성능측정] std::cout << "Garbage Collection Complete.\n\n";
 }

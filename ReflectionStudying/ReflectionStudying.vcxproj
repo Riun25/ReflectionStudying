@@ -131,11 +131,15 @@
     <ClCompile Include="GarbageCollection\GCCollector.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Reflection\Primitives.cpp" />
+    <ClCompile Include="RPC\RPCSystem.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GarbageCollection\GCCollector.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Reflection\Reflect.h" />
+    <ClInclude Include="RPC\RPCSystem.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -88,6 +88,25 @@ namespace reflect
 		TypeDescriptor_SubClass(const char* _name, size_t _size, const std::initializer_list<Member>& _init) : TypeDescriptor(nullptr, 0), memberVec(_init) {}
 
 	public:
+		// 참조 카운트 관리
+		void IncrementReference() 
+		{
+			referenceCount++; 
+		}
+
+		void DecrementReference()
+		{
+			if (--referenceCount == 0)
+			{
+				Delete(this);
+			}
+		}
+
+		int GetReferenceCount() const
+		{
+			return referenceCount;
+		}
+
 		virtual void Dump(const void* _obj, int _indentLevel) const override
 		{
 			std::cout << name << "\n" << std::string(4 * _indentLevel, ' ') << "{\n";
@@ -153,12 +172,15 @@ namespace reflect
 	public:
 		std::vector<Member> memberVec;
 		std::vector<Function> functionVec;
+
+	private:
+		int referenceCount;
 	};
 
 #define REFLECT() \
 	friend class reflect::DefaultResolver; \
 	static reflect::TypeDescriptor_SubClass Reflection; \
-	static void initReflection(reflect::TypeDescriptor_SubClass*);
+	static void initReflection(reflect::TypeDescriptor_SubClass*);\
 
 #define REFLECT_STRUCT_BEGIN(_type) \
     reflect::TypeDescriptor_SubClass _type::Reflection{ _type::initReflection }; \

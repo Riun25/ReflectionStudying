@@ -1,5 +1,6 @@
 #include "Node.h"
 #include "GarbageCollection/GCCollector.h"
+#include "Timer.h"
 #include <vector>
 
 
@@ -19,7 +20,12 @@ int main()
 	std::cout << "--- Before Garbage Collection ---\n";
 	typeDesc->Dump(root); // 디스크립터를 사용하여 노드 덤프 출력
 
+	Timer* timer = new Timer();
+
 	gc.Collect(typeDesc); // 첫 번째 GC 실행
+
+	timer->Stop();
+	std::cout << "GC Execution Time: " << timer->ElapsedMilliseconds() << " ms\n";
 
 	// 참조 제거 후 GC 실행
 	root->children.clear();   // 자식 참조 제거 -> "pineapple"과 "banana" unreachable 상태로 만듦
@@ -28,6 +34,8 @@ int main()
 	std::cout << "\n--- After Clearing References ---\n";
 
 	gc.Collect(typeDesc); // 두 번째 GC 실행
+
+	delete timer;
 
 	return 0;
 }

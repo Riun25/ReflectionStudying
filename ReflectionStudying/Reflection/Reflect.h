@@ -1,16 +1,13 @@
 #pragma once
-#include <string>
-#include <iostream>
-#include <cstddef>
-#include <vector>
-#include <type_traits>
+#include "../RPC/RPCSystem.h"
 #include <unordered_set>
 
-namespace reflect
-{
+// 리플렉션 시스템
+namespace reflect {
 	class TypeDescriptor
 	{
 	public:
+		TypeDescriptor() : name(nullptr), size(0) {}
 		TypeDescriptor(const char* _name, size_t _size) : name(_name), size(_size) {}
 		virtual ~TypeDescriptor() {}
 
@@ -29,7 +26,6 @@ namespace reflect
 	template <typename T>
 	TypeDescriptor* GetPrimitiveDescriptor();
 
-	// T의 static 멤버변수 Reflection의 유무에 따른 TypeDescriptor 객체 찾기
 	class DefaultResolver
 	{
 	public:
@@ -62,36 +58,26 @@ namespace reflect
 		}
 	};
 
-	class TypeDescriptor_SubClass : public TypeDescriptor
+	class TypeDescriptor_SubClass :public TypeDescriptor
 	{
 	public:
 		struct Member
 		{
-			const char* name;
+			std::string name;
 			size_t offset;
-			TypeDescriptor* type;
+			TypeDescriptor* type; // 타입 정보를 저장 (예: int, std::string 등)
 		};
 
 		struct Function
 		{
-			const char* name;
-			const char* returnType;
-			std::vector<const char*> parameterTypes;
+			std::string name;
+			std::function<void(void*, const std::vector<std::any>&)> invoker;
 		};
 
-
-	public:
-		TypeDescriptor_SubClass(void (*init)(TypeDescriptor_SubClass*)) : TypeDescriptor(nullptr, 0)
+	public: // TODO : 공란이니 채울 것
+		void IncrementReference()
 		{
-			init(this);
-		}
-		TypeDescriptor_SubClass(const char* _name, size_t _size, const std::initializer_list<Member>& _init) : TypeDescriptor(nullptr, 0), memberVec(_init) {}
-
-	public:
-		// 참조 카운트 관리
-		void IncrementReference() 
-		{
-			referenceCount++; 
+			referenceCount++;
 		}
 
 		void DecrementReference()
@@ -106,8 +92,7 @@ namespace reflect
 		{
 			return referenceCount;
 		}
-
-		virtual void Dump(const void* _obj, int _indentLevel) const override
+		virtual void Dump(const void* _obj, int _indentLevel = 0) const override
 		{
 			std::cout << name << "\n" << std::string(4 * _indentLevel, ' ') << "{\n";
 
@@ -120,18 +105,17 @@ namespace reflect
 
 			for (const Function& eFunction : functionVec)
 			{
-				std::cout << std::string(4 * (_indentLevel + 1), ' ') << "Function: " << eFunction.name
-					<< " -> Return Type: " << eFunction.returnType << ", Parameters: (";
-				for (const char* paramType : eFunction.parameterTypes)
+				std::cout << std::string(4 * (_indentLevel + 1), ' ') << "Function: " << eFunction.name;
+				//	<< " -> Return Type: " << eFunction.returnType << ", Parameters: (";
+				/*for (const char* paramType : eFunction.parameterTypes)
 				{
 					std::cout << paramType << " ";
-				}
+				}*/
 				std::cout << ")\n";
 			}
 
 			std::cout << std::string(4 * _indentLevel, ' ') << "}\n";
 		}
-
 		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const override
 		{
 			if (_obj == nullptr)
@@ -144,7 +128,7 @@ namespace reflect
 				return;
 			}
 			_markedObjects.insert(_obj);
-			
+
 			for (const Member& member : memberVec)
 			{
 				// std::cout << "Marking object: " << (char*)_obj << "\n"; 디버깅용
@@ -152,7 +136,6 @@ namespace reflect
 				member.type->Mark(memberPtr, _markedObjects);
 			}
 		}
-
 		virtual void Delete(void* _obj) const override
 		{
 			if (_obj == nullptr)
@@ -161,45 +144,53 @@ namespace reflect
 			}
 
 			// 멤버 변수 삭제
-			for (const Member& member : memberVec) 
+			for (const Member& member : memberVec)
 			{
 				void* memberPtr = (char*)_obj + member.offset;
 				member.type->Delete(memberPtr);  // 멤버의 타입 정보를 사용해 삭제
 			}
 		}
-
-
 	public:
 		std::vector<Member> memberVec;
 		std::vector<Function> functionVec;
 
+		// 초기화 함수 포인터
+		using InitFunc = void(*)(TypeDescriptor_SubClass*);
+		TypeDescriptor_SubClass(InitFunc initFunc) { initFunc(this); }
+
 	private:
-		int referenceCount;
+		int referenceCount = 0;
 	};
 
+	// 리플렉션 매크로
 #define REFLECT() \
 	friend class reflect::DefaultResolver; \
 	static reflect::TypeDescriptor_SubClass Reflection; \
-	static void initReflection(reflect::TypeDescriptor_SubClass*);\
+	static void initReflection(reflect::TypeDescriptor_SubClass*);
 
 #define REFLECT_STRUCT_BEGIN(_type) \
-    reflect::TypeDescriptor_SubClass _type::Reflection{ _type::initReflection }; \
-    void _type::initReflection(reflect::TypeDescriptor_SubClass* _typeDesc) \
-    { \
-        using T = _type; \
-        _typeDesc->name = #_type; \
-        _typeDesc->size = sizeof(T); \
-        _typeDesc->memberVec.clear(); \
-        _typeDesc->functionVec.clear();
+	reflect::TypeDescriptor_SubClass _type::Reflection{ _type::initReflection }; \
+	void _type::initReflection(reflect::TypeDescriptor_SubClass* _typeDesc) { \
+		using T = _type; \
+		_typeDesc->name = #_type; \
+		_typeDesc->size = sizeof(T); \
+		_typeDesc->memberVec.clear(); \
+		_typeDesc->functionVec.clear();
 
 #define REFLECT_STRUCT_MEMBER(_name) \
-        _typeDesc->memberVec.push_back({#_name, offsetof(T, _name), reflect::TTypeResolver<decltype(T::_name)>::Get()});
+		_typeDesc->memberVec.push_back({#_name, offsetof(T, _name), reflect::TTypeResolver<decltype(T::_name)>::Get()});
 
-#define REFLECT_STRUCT_FUNCTION(_name, _returnType, ...) \
-        _typeDesc->functionVec.push_back({#_name, #_returnType, {#__VA_ARGS__}});
+#define REFLECT_STRUCT_FUNCTION(_type, _func) \
+		_typeDesc->functionVec.push_back({#_func, [](void* obj, const std::vector<std::any>& args) { \
+			CallWithArgs(&_type::_func, static_cast<_type*>(obj), args); \
+		}});
 
 #define REFLECT_STRUCT_END() \
-    }
+		for (const auto& func : _typeDesc->functionVec) { \
+			RPCSystem::GetInstance().RegisterFunction(_typeDesc->name, func.name, func.invoker); \
+		} \
+	}
+
 
 	class TypeDescriptor_StdVector : public TypeDescriptor
 	{
@@ -247,7 +238,7 @@ namespace reflect
 
 		virtual void Delete(void* _obj) const override
 		{
-			if (_obj == nullptr) 
+			if (_obj == nullptr)
 			{
 				return;
 			}
@@ -288,4 +279,5 @@ namespace reflect
 			return &typeDesc;
 		}
 	};
-}
+
+} // namespace reflect

@@ -2,31 +2,12 @@
 #include <unordered_set>
 #include <vector>
 #include <iostream>
+#include "../Reflection/Reflect.h"
 
-struct Node;
 class reflect::TypeDescriptor;
 
 namespace GC
 {
-	/*class Object
-	{
-	public:
-		bool marked = false;
-		std::vector<Object*> references;
-		uint32_t id;
-
-		Object(uint32_t _id)
-			: id(_id)
-		{
-		}
-
-		void AddReference(Object* _obj)
-		{
-			references.push_back(_obj);
-			std::cout << "Object" << this->id << " now references Object " << _obj->id <<"\n";
-		}
-	};*/
-
 	class GarbageCollector
 	{
 	public:

@@ -1,6 +1,9 @@
+#pragma once
 #include "Reflect.h"
+#include <iostream>
 
-namespace reflect {
+namespace reflect 
+{
 
 	// A type descriptor for int
 	class TypeDescriptor_Int : public TypeDescriptor

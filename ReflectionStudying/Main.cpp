@@ -1,8 +1,24 @@
+#include "Timer.h"
 #include "Node.h"
 #include "GarbageCollection/GCCollector.h"
-#include "Timer.h"
 #include <vector>
 
+class MultiParamClass
+{
+public:
+	MultiParamClass(int id, std::string name) : id(id), name(std::move(name)) {}
+
+	void PrintInfo(const std::string& extraInfo, int value)
+	{
+		std::cout << "Name: " << name << ", Extra: " << extraInfo << ", Value: " << value << std::endl;
+	}
+
+	REFLECT()
+
+private:
+	int id;
+	std::string name;
+};
 
 int main()
 {
@@ -37,6 +53,14 @@ int main()
 
 	delete timer;
 
+	RPCSystem& rpc = RPCSystem::GetInstance();
+	MultiParamClass obj(1, "TestObject");
+
+	// 동적 호출
+	rpc.Invoke("MultiParamClass", "PrintInfo", &obj,
+		{ std::string("Extra Information"), 42 });
+
+
 	return 0;
 }
 
@@ -45,10 +69,9 @@ REFLECT_STRUCT_BEGIN(Node)
 REFLECT_STRUCT_MEMBER(key)
 REFLECT_STRUCT_MEMBER(value)
 REFLECT_STRUCT_MEMBER(children)
-REFLECT_STRUCT_FUNCTION(Print, void)
-REFLECT_STRUCT_FUNCTION(Add, int, int, int)
+REFLECT_STRUCT_FUNCTION(Node, Add)
 REFLECT_STRUCT_END()
 
-REFLECT_STRUCT_BEGIN(MyStruct)
-REFLECT_STRUCT_FUNCTION(Print, void)
+REFLECT_STRUCT_BEGIN(MultiParamClass)
+REFLECT_STRUCT_FUNCTION(MultiParamClass, PrintInfo)
 REFLECT_STRUCT_END()

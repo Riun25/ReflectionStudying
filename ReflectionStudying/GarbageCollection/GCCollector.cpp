@@ -1,4 +1,3 @@
-#include "../Reflection/Reflect.h"
 #include "GCCollector.h"
 
 void GC::GarbageCollector::Allocate(void* _obj)

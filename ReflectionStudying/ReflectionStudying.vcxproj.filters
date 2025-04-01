@@ -27,9 +27,6 @@
     <ClCompile Include="Timer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="RPC\RPCSystem.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Reflection\Reflect.h">
@@ -45,6 +42,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="RPC\RPCSystem.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="RPC\ObjectRegistry.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

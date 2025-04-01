@@ -1,10 +1,13 @@
 #pragma once
-#include "Reflect.h"
+#include "Descriptor.h"
 #include <iostream>
+
+/* 추가한 타입------------------------------
+int, float, double, char, bool, std::string
+------------------------------------------*/
 
 namespace reflect 
 {
-
 	// A type descriptor for int
 	class TypeDescriptor_Int : public TypeDescriptor
 	{
@@ -27,6 +30,114 @@ namespace reflect
 	TypeDescriptor* GetPrimitiveDescriptor<int>()
 	{
 		static TypeDescriptor_Int typeDesc;
+		return &typeDesc;
+	}
+
+	// A type descriptor for float
+	class TypeDescriptor_Float : public TypeDescriptor
+	{
+	public:
+		TypeDescriptor_Float() : TypeDescriptor("float", sizeof(float)) {}
+
+		virtual void Dump(const void* _obj, int /* unused */) const override
+		{
+			std::cout << "float{" << *(const float*)_obj << "}";
+		}
+
+		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
+		{
+		}
+
+		virtual void Delete(void* _obj) const override
+		{
+		}
+	};
+
+	template <>
+	TypeDescriptor* GetPrimitiveDescriptor<float>()
+	{
+		static TypeDescriptor_Float typeDesc;
+		return &typeDesc;
+	}
+
+	// A type descriptor for double
+	class TypeDescriptor_Double : public TypeDescriptor
+	{
+	public:
+		TypeDescriptor_Double() : TypeDescriptor("double", sizeof(double)) {}
+
+		virtual void Dump(const void* _obj, int /* unused */) const override
+		{
+			std::cout << "double{" << *(const double*)_obj << "}";
+		}
+
+		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
+		{
+		}
+
+		virtual void Delete(void* _obj) const override
+		{
+		}
+	};
+
+	template <>
+	TypeDescriptor* GetPrimitiveDescriptor<double>()
+	{
+		static TypeDescriptor_Double typeDesc;
+		return &typeDesc;
+	}
+
+	// A type descriptor for char
+	class TypeDescriptor_Char : public TypeDescriptor
+	{
+	public:
+		TypeDescriptor_Char() : TypeDescriptor("char", sizeof(char)) {}
+
+		virtual void Dump(const void* _obj, int /* unused */) const override
+		{
+			std::cout << "char{" << *(const char*)_obj << "}";
+		}
+
+		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
+		{
+		}
+
+		virtual void Delete(void* _obj) const override
+		{
+		}
+	};
+
+	template <>
+	TypeDescriptor* GetPrimitiveDescriptor<char>()
+	{
+		static TypeDescriptor_Char typeDesc;
+		return &typeDesc;
+	}
+
+	// A type descriptor for bool
+	class TypeDescriptor_Bool : public TypeDescriptor
+	{
+	public:
+		TypeDescriptor_Bool() : TypeDescriptor("bool", sizeof(bool)) {}
+
+		virtual void Dump(const void* _obj, int /* unused */) const override
+		{
+			std::cout << "bool{" << *(const bool*)_obj << "}";
+		}
+
+		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
+		{
+		}
+
+		virtual void Delete(void* _obj) const override
+		{
+		}
+	};
+
+	template <>
+	TypeDescriptor* GetPrimitiveDescriptor<bool>()
+	{
+		static TypeDescriptor_Bool typeDesc;
 		return &typeDesc;
 	}
 
@@ -54,5 +165,4 @@ namespace reflect
 		static TypeDescriptor_StdString typeDesc;
 		return &typeDesc;
 	}
-
-} // namespace reflect
+}

@@ -2,7 +2,7 @@
 #include <unordered_set>
 #include <vector>
 #include <iostream>
-#include "../Reflection/Reflect.h"
+#include "../Reflection/Descriptor.h"
 
 class reflect::TypeDescriptor;
 

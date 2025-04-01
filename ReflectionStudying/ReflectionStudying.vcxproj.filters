@@ -27,9 +27,18 @@
     <ClCompile Include="Timer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Reflection\Reference.h">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Reflection\Container.h">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Reflection\re.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Reflection\Reflect.h">
+    <ClInclude Include="Reflection\ReflectMacro.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
     <ClInclude Include="GarbageCollection\GCCollector.h">
@@ -45,6 +54,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="RPC\ObjectRegistry.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Resolver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Descriptor.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

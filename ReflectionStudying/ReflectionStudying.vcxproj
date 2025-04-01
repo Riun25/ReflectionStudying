@@ -130,13 +130,18 @@
   <ItemGroup>
     <ClCompile Include="GarbageCollection\GCCollector.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Reflection\Container.h" />
     <ClCompile Include="Reflection\Primitives.cpp" />
+    <ClCompile Include="Reflection\re.cpp" />
+    <ClCompile Include="Reflection\Reference.h" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GarbageCollection\GCCollector.h" />
     <ClInclude Include="Node.h" />
-    <ClInclude Include="Reflection\Reflect.h" />
+    <ClInclude Include="Reflection\Descriptor.h" />
+    <ClInclude Include="Reflection\ReflectMacro.h" />
+    <ClInclude Include="Reflection\Resolver.h" />
     <ClInclude Include="RPC\ObjectRegistry.h" />
     <ClInclude Include="RPC\RPCSystem.h" />
     <ClInclude Include="Timer.h" />

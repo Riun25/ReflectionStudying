@@ -42,9 +42,26 @@ private:
 template <typename T>
 struct function_traits;
 
+template <typename ReturnType, typename... Args>
+struct function_traits<std::function<ReturnType(Args...)>> 
+{
+	using return_type = ReturnType;
+	using args_tuple = std::tuple<Args...>;
+	static constexpr size_t arg_count = sizeof...(Args);
+};
+
 // 멤버 함수 포인터의 경우
 template <typename ReturnType, typename ClassType, typename... Args>
 struct function_traits<ReturnType(ClassType::*)(Args...)>
+{
+	using return_type = ReturnType;
+	using args_tuple = std::tuple<Args...>;
+	static constexpr size_t arg_count = sizeof...(Args);
+};
+
+// const 멤버 함수 포인터의 경우
+template <typename ReturnType, typename ClassType, typename... Args>
+struct function_traits<ReturnType(ClassType::*)(Args...) const> 
 {
 	using return_type = ReturnType;
 	using args_tuple = std::tuple<Args...>;
@@ -67,4 +84,26 @@ auto CallWithArgs(Func func, Obj* obj, const std::vector<std::any>& args)
 		throw std::runtime_error("Incorrect number of arguments for function");
 	}
 	return InvokeWithTuple(func, obj, args, std::make_index_sequence<argCount>{});
+}
+
+// 튜플의 각 요소의 타입 이름을 문자열로 반환
+template <typename Tuple, std::size_t... Index>
+std::vector<std::string> GetParameterTypeNamesImpl(std::index_sequence<Index...>) 
+{
+	return { typeid(std::tuple_element_t<Index, Tuple>).name()... };
+}
+
+template <typename Tuple>
+std::vector<std::string> GetParameterTypeNames() 
+{
+	return GetParameterTypeNamesImpl<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{});
+}
+
+// 함수의 매개변수 타입을 문자열 벡터로 반환
+template <typename Func>
+std::vector<std::string> GetFunctionParameterTypes() 
+{
+	using traits = function_traits<Func>;
+	using args_tuple = typename traits::args_tuple;
+	return GetParameterTypeNames<args_tuple>();
 }

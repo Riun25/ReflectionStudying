@@ -1,6 +1,6 @@
 #pragma once
 #include <random>
-#include "Reflection/Reflect.h"
+#include "Reflection/ReflectMacro.h"
 #include "GarbageCollection/GCCollector.h"
 
 struct Node

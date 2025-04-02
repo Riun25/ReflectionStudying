@@ -130,9 +130,11 @@
   <ItemGroup>
     <ClCompile Include="GarbageCollection\GCCollector.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Node.cpp" />
     <ClCompile Include="Reflection\Container.h" />
     <ClCompile Include="Reflection\Primitives.cpp" />
     <ClCompile Include="Reflection\Reference.h" />
+    <ClCompile Include="TestFunctions.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +145,7 @@
     <ClInclude Include="Reflection\Resolver.h" />
     <ClInclude Include="RPC\ObjectRegistry.h" />
     <ClInclude Include="RPC\RPCSystem.h" />
+    <ClInclude Include="TestFunctions.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

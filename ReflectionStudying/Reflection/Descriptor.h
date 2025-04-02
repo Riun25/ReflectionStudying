@@ -54,24 +54,7 @@ namespace reflect
 			}
 		};
 
-	public: // TODO : 공란이니 채울 것
-		void IncrementReference()
-		{
-			referenceCount++;
-		}
-
-		void DecrementReference()
-		{
-			if (--referenceCount == 0)
-			{
-				Delete(this);
-			}
-		}
-
-		int GetReferenceCount() const
-		{
-			return referenceCount;
-		}
+	public: 
 		virtual void Dump(const void* _obj, int _indentLevel = 0) const override
 		{
 			std::cout << name << "\n" << std::string(4 * _indentLevel, ' ') << "{\n";
@@ -98,21 +81,17 @@ namespace reflect
 		}
 		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const override
 		{
-			if (_obj == nullptr)
+			if (_markedObjects.find(const_cast<void*>(_obj)) != _markedObjects.end())
 			{
 				return;
 			}
 
-			if (_markedObjects.find(_obj) != _markedObjects.end())
-			{
-				return;
-			}
-			_markedObjects.insert(_obj);
+			_markedObjects.insert(const_cast<void*>(_obj));
 
 			for (const Member& member : memberVec)
 			{
 				// std::cout << "Marking object: " << (char*)_obj << "\n"; 디버깅용
-				const void* memberPtr = (char*)_obj + member.offset;
+				const void* memberPtr = static_cast<const char*>(_obj) + member.offset;
 				member.type->Mark(memberPtr, _markedObjects);
 			}
 		}
@@ -126,7 +105,7 @@ namespace reflect
 			// 멤버 변수 삭제
 			for (const Member& member : memberVec)
 			{
-				void* memberPtr = (char*)_obj + member.offset;
+				void* memberPtr = static_cast<char*>(_obj) + member.offset;
 				member.type->Delete(memberPtr);  // 멤버의 타입 정보를 사용해 삭제
 			}
 		}
@@ -136,9 +115,6 @@ namespace reflect
 
 		// 초기화 함수 포인터
 		using InitFunc = void(*)(TypeDescriptor_SubClass*);
-		TypeDescriptor_SubClass(InitFunc initFunc) { initFunc(this); }
-
-	private:
-		int referenceCount = 0;
+		TypeDescriptor_SubClass(InitFunc initFunc) {initFunc(this);	}
 	};
 }

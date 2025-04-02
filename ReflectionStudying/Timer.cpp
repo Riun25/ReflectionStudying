@@ -1,3 +1,4 @@
+#pragma once
 #include "Timer.h"
 #include <iostream>
 
@@ -8,7 +9,7 @@ Timer::Timer() :startTime(std::chrono::high_resolution_clock::now()), endTime(st
 Timer::~Timer()
 {
     Stop();
-    std::cout << "Elapsed Time: " << ElapsedMilliseconds() << " ms\n";
+    //std::cout << "Elapsed Time: " << ElapsedMilliseconds() << " ms\n";
 }
 
 void Timer::Start()

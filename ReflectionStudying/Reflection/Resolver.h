@@ -46,7 +46,19 @@ namespace reflect
 	template <typename T>
 	class TTypeResolver<std::vector<T>>;
 
+	//A type descriptor for raw_ptr
+	template <typename T>
+	class TTypeResolver<T*>;
+
 	//A type descriptor for unique_ptr<>
 	template <typename T>
 	class TTypeResolver<std::unique_ptr<T>>;
+
+	//A type descriptor for shared_ptr<>
+	template <typename T>
+	class TTypeResolver<std::shared_ptr<T>>;
+
+	//A type descriptor for weak_ptr<>
+	template <typename T>
+	class TTypeResolver<std::weak_ptr<T>>;
 }

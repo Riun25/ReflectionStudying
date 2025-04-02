@@ -1,78 +1,69 @@
 #include "GCCollector.h"
 
-void GC::GarbageCollector::Allocate(void* _obj)
+void GC::GarbageCollector::RegisterType(reflect::TypeDescriptor* typeDesc)
 {
-    heap.insert(_obj);
+	registeredTypes.insert(typeDesc);
+}
+
+void GC::GarbageCollector::Allocate(void* _obj, reflect::TypeDescriptor* _typeDesc)
+{
+	heap[_obj] = _typeDesc; // 객체와 타입 디스크립터 저장
 }
 
 void GC::GarbageCollector::AddRoot(void* _root)
 {
-	if (std::find(roots.begin(), roots.end(), _root) == roots.end()) 
-    {
-		roots.push_back(_root);
-		static_cast<reflect::TypeDescriptor_SubClass*>(_root)->IncrementReference();
-		std::cout << "Object added as a root.\n";
-	}
-	else 
-    {
-		std::cout << "Object is already a root.\n";
-	}
+	roots.insert(_root); // 루트 추가
 }
 
 void GC::GarbageCollector::RemoveRoot(void* _root)
 {
-    auto it = std::find(roots.begin(), roots.end(), _root);
-    if (it != roots.end())
-    {
-        roots.erase(it);
-    	static_cast<reflect::TypeDescriptor_SubClass*>(_root)->DecrementReference();
-	    std::cout << "Object removed as a root.\n";
-    }
-    else
-    {
-        std::cout << "Object not found in roots.\n";
-    }
+	roots.erase(_root);
 }
 
 void GC::GarbageCollector::ClearRoots()
 {
-    roots.clear();
+	roots.clear();
 }
 
-void GC::GarbageCollector::Mark(reflect::TypeDescriptor* _typeDesc)
+void GC::GarbageCollector::Mark()
 {
-    /// [성능측정] std::cout << "\nStarting Marking...\n";
-
-    for (void* root : roots)
-    {
-        _typeDesc->Mark(root, markedObjects);
-    }
+	/// [성능측정] std::cout << "\nStarting Marking...\n";
+	for (void* root : roots) 
+	{
+		if (markedObjects.find(root) == markedObjects.end()) 
+		{
+			auto it = heap.find(root);
+			if (it != heap.end()) 
+			{
+				reflect::TypeDescriptor* typeDesc = it->second;
+				typeDesc->Mark(root, markedObjects); // 리플렉션 정보를 사용하여 마킹 수행
+			}
+		}
+	}
 }
 
-void GC::GarbageCollector::Sweep(reflect::TypeDescriptor* _typeDesc)
+void GC::GarbageCollector::Sweep()
 {
-    /// [성능측정]std::cout << "\nStarting Sweeping...\n";
-    for (auto it = heap.begin(); it != heap.end();)
-    {
-        auto* obj = static_cast<reflect::TypeDescriptor_SubClass*>(*it);
-        if (markedObjects.find(*it) == markedObjects.end() && obj->GetReferenceCount() == 0) // 마킹되지 않은 경우 삭제
-        {
-            std::cout << "Collecting: " << *it << "\n";
-            _typeDesc->Delete(*it);
-            it = heap.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
-    markedObjects.clear(); // 다음 GC를 위해 초기화
+	for (auto it = heap.begin(); it != heap.end(); ) 
+	{
+		if (markedObjects.find(it->first) == markedObjects.end()) 
+		{
+			std::cout << "Collecting: " << it->first << "\n";
+			reflect::TypeDescriptor* typeDesc = it->second;
+			typeDesc->Delete(it->first); // 리플렉션 정보를 사용하여 객체 삭제
+			it = heap.erase(it);         // 힙에서 제거
+		}
+		else 
+		{
+			++it;
+		}
+	}
 }
 
-void GC::GarbageCollector::Collect(reflect::TypeDescriptor* _typeDesc)
+void GC::GarbageCollector::Collect()
 {
-    /// [성능측정] std::cout << "\nStarting Garbage Collection...\n";
-    Mark(_typeDesc);
-    Sweep(_typeDesc);
-    /// [성능측정] std::cout << "Garbage Collection Complete.\n\n";
+	/// [성능측정] std::cout << "\nStarting Garbage Collection...\n";
+	Mark();
+	Sweep();
+	/// [성능측정] std::cout << "Garbage Collection Complete.\n\n";
 }

@@ -1,7 +1,9 @@
 #pragma once
-#include <unordered_set>
 #include <vector>
-#include <iostream>
+#include <queue>
+#include <thread>
+#include <mutex>
+#include <atomic>
 #include "../Reflection/Descriptor.h"
 
 class reflect::TypeDescriptor;
@@ -34,15 +36,17 @@ namespace GC
 
 		// 가비지 컬렉션
 		void Mark();
-		void Sweep();
-		void Collect();
+		void ConcurrentMark();
+		void Sweep(bool _isDump);
+		void Collect(bool _isDump = false);
 
-		// 테스트를 위한 heap public화
-		std::unordered_map<void*, reflect::TypeDescriptor*> heap;     // 객체와 타입 정보
+		// 테스트를 위한 heap size
+		inline int GetHeapSize() { return heap.size(); }
 
 	private:
 		std::unordered_set<void*> roots; // 루트 집합
 		std::unordered_set<const void*> markedObjects; // 마킹된 객체 집합
+		std::unordered_map<void*, reflect::TypeDescriptor*> heap;     // 객체와 타입 정보
 		std::unordered_set<reflect::TypeDescriptor*> registeredTypes; // 등록된 타입 정보
 	};
 }

@@ -8,6 +8,9 @@ public:
 	TestFunctions(GC::GarbageCollector& _gc);
 	~TestFunctions();
 
+	void PrintClass();
+
+	void RunGCTest(size_t _count);
 	void RunGCTimerTest(size_t _count);
 	void RunPtrTests();
 	void RunGCHeapTests();

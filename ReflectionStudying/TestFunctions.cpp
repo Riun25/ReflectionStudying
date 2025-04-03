@@ -11,6 +11,39 @@ TestFunctions::~TestFunctions()
 	delete timer;
 }
 
+void TestFunctions::PrintClass()
+{
+	reflect::TypeDescriptor* typeDesc = reflect::TTypeResolver<Node>::Get();
+	// 랜덤 그래프 생성
+	Node* node = new Node("Dog", 1, { {"Cat", 2, {}}, {"Rabbit", 3, {}} });
+	typeDesc->Dump(node);
+	delete node;
+}
+
+void TestFunctions::RunGCTest(size_t _count)
+{
+	// Node 타입에 대한 리플렉션 초기화
+	reflect::TypeDescriptor* typeDesc = reflect::TTypeResolver<Node>::Get();
+	// 랜덤 그래프 생성
+	Node* root = CreateRandomGraph(gc, _count);
+	// 루트 설정
+	gc.AddRoot(root);
+
+	// 첫 번째 GC 실행 전 상태 출력
+	std::cout << "--- Before Garbage Collection ---\n";
+	typeDesc->Dump(root); // 디스크립터를 사용하여 노드 덤프 출력
+
+	gc.Collect(true); // 첫 번째 GC 실행
+
+	// 참조 제거 후 GC 실행
+	root->children.clear();   // 자식 참조 제거 -> "pineapple"과 "banana" unreachable 상태로 만듦
+	gc.ClearRoots();          // 루트를 비워서 node도 unreachable 상태로 만듦
+
+	std::cout << "\n--- After Clearing References ---\n";
+
+	gc.Collect(true); // 두 번째 GC 실행
+}
+
 void TestFunctions::RunGCTimerTest(size_t _count)
 {
 	// Node 타입에 대한 리플렉션 초기화
@@ -55,7 +88,6 @@ void TestFunctions::RunPtrTests()
 	TestRawPtr();
 }
 
-// 이 테스트는 GCCollector의 heap을 private에서 public으로 옮기고 진행할 것
 void TestFunctions::RunGCHeapTests()
 {
 	reflect::TypeDescriptor* typeDesc = reflect::TTypeResolver<Node>::Get();
@@ -68,18 +100,18 @@ void TestFunctions::RunGCHeapTests()
 		gc.AddRoot(root);                      // 루트 추가
 
 		std::cout << "--- Before Garbage Collection ---\n";
-		std::cout << "Heap size: " << gc.heap.size() << "\n";
+		std::cout << "Heap size: " << gc.GetHeapSize() << "\n";
 
 		gc.Collect(); // 가비지 컬렉션 실행
 
 		std::cout << "--- After Garbage Collection ---\n";
-		std::cout << "Heap size: " << gc.heap.size() << "\n";
+		std::cout << "Heap size: " << gc.GetHeapSize() << "\n";
 
 		gc.ClearRoots();      // 루트 초기화
 		gc.Collect(); // 가비지 컬렉션 실행
 
 		std::cout << "--- After Clearing Roots and Second Garbage Collection ---\n";
-		std::cout << "Heap size: " << gc.heap.size() << "\n";
+		std::cout << "Heap size: " << gc.GetHeapSize() << "\n";
 	}
 }
 

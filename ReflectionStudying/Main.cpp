@@ -27,8 +27,11 @@ int main()
 	GC::GarbageCollector gc;
 
 	TestFunctions* test = new TestFunctions(gc);
-	//test->RunGCTimerTest();
-	test->RunGCHeapTests();
+	for (int i = 0; i < 10; i++)
+	{
+		test->RunGCTimerTest(10000);
+	}
+	//test->RunGCHeapTests();
 	//test->RunPtrTests();
 	delete test;
 

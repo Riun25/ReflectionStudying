@@ -7,7 +7,7 @@ struct Node
 {
 	std::string key;
 	int value;
-	float floatValue;
+	//float floatValue;
 	std::vector<Node> children;
 
 	void Print() {}
@@ -23,4 +23,4 @@ struct MyStruct
 	REFLECT()
 };
 
-Node* CreateRandomGraph(GC::GarbageCollector& _gc, int _numNodes);
+Node* CreateRandomGraph(GC::GarbageCollector& _gc, size_t _numNodes);

@@ -11,18 +11,18 @@ TestFunctions::~TestFunctions()
 	delete timer;
 }
 
-void TestFunctions::RunGCTimerTest()
+void TestFunctions::RunGCTimerTest(size_t _count)
 {
 	// Node 타입에 대한 리플렉션 초기화
 	reflect::TypeDescriptor* typeDesc = reflect::TTypeResolver<Node>::Get();
 	// 랜덤 그래프 생성
-	Node* root = CreateRandomGraph(gc, 10);
+	Node* root = CreateRandomGraph(gc, _count);
 	// 루트 설정
 	gc.AddRoot(root);
 
 	// 첫 번째 GC 실행 전 상태 출력
-	std::cout << "--- Before Garbage Collection ---\n";
-	typeDesc->Dump(root); // 디스크립터를 사용하여 노드 덤프 출력
+	//std::cout << "--- Before Garbage Collection ---\n";
+	//typeDesc->Dump(root); // 디스크립터를 사용하여 노드 덤프 출력
 
 	timer->Start();
 
@@ -35,7 +35,7 @@ void TestFunctions::RunGCTimerTest()
 	root->children.clear();   // 자식 참조 제거 -> "pineapple"과 "banana" unreachable 상태로 만듦
 	gc.ClearRoots();          // 루트를 비워서 node도 unreachable 상태로 만듦
 
-	std::cout << "\n--- After Clearing References ---\n";
+	//std::cout << "\n--- After Clearing References ---\n";
 
 	gc.Collect(); // 두 번째 GC 실행
 }

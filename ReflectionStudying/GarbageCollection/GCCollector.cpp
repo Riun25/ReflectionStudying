@@ -44,11 +44,13 @@ void GC::GarbageCollector::Mark()
 
 void GC::GarbageCollector::Sweep()
 {
+	size_t deleteCount = 0;
+
 	for (auto it = heap.begin(); it != heap.end(); ) 
 	{
 		if (markedObjects.find(it->first) == markedObjects.end()) 
 		{
-			std::cout << "Collecting: " << it->first << "\n";
+			//std::cout << "Collecting: " << it->first << "\n";
 			reflect::TypeDescriptor* typeDesc = it->second;
 			typeDesc->Delete(it->first); // 리플렉션 정보를 사용하여 객체 삭제
 			it = heap.erase(it);         // 힙에서 제거

@@ -8,7 +8,7 @@ public:
 	TestFunctions(GC::GarbageCollector& _gc);
 	~TestFunctions();
 
-	void RunGCTimerTest();
+	void RunGCTimerTest(size_t _count);
 	void RunPtrTests();
 	void RunGCHeapTests();
 

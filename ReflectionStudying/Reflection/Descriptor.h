@@ -16,10 +16,9 @@ namespace reflect
 		virtual ~TypeDescriptor() {}
 
 	public:
-		virtual std::string GetFullName() const { return name; }
+		virtual std::string GetFullName() const { return name; };
 		virtual void Dump(const void* _obj, int _indentLevel = 0) const = 0;
-		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const = 0;
-		virtual void Delete(void* _obj) const = 0;
+		virtual bool IsPrimitive() const { return false; } // Default: non-primitive
 
 	public:
 		const char* name;
@@ -79,36 +78,7 @@ namespace reflect
 
 			std::cout << std::string(4 * _indentLevel, ' ') << "}\n";
 		}
-		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const override
-		{
-			if (_markedObjects.find(const_cast<void*>(_obj)) != _markedObjects.end())
-			{
-				return;
-			}
 
-			_markedObjects.insert(const_cast<void*>(_obj));
-
-			for (const Member& member : memberVec)
-			{
-				// std::cout << "Marking object: " << (char*)_obj << "\n"; 디버깅용
-				const void* memberPtr = static_cast<const char*>(_obj) + member.offset;
-				member.type->Mark(memberPtr, _markedObjects);
-			}
-		}
-		virtual void Delete(void* _obj) const override
-		{
-			if (_obj == nullptr)
-			{
-				return;
-			}
-
-			// 멤버 변수 삭제
-			for (const Member& member : memberVec)
-			{
-				void* memberPtr = static_cast<char*>(_obj) + member.offset;
-				member.type->Delete(memberPtr);  // 멤버의 타입 정보를 사용해 삭제
-			}
-		}
 	public:
 		std::vector<Member> memberVec;
 		std::vector<Function> functionVec;

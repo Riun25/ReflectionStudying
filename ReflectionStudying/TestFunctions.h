@@ -5,15 +5,17 @@
 class TestFunctions
 {
 public:
-	TestFunctions(GC::GarbageCollector& _gc);
+	TestFunctions();
 	~TestFunctions();
 
 	void PrintClass();
 
-	void RunGCTest(size_t _count);
-	void RunGCTimerTest(size_t _count);
+	void RunGCBasicTest(ObjectManager* _objectManager);
+	void RunGCTest(ObjectManager* _objectManager, size_t _count);
+	void RunGCTimerTest(ObjectManager* _objectManager, size_t _count);
+	/*void RunGCTimerTest_LimitPerFrame(ObjectManager* _objectManager, size_t _count);
 	void RunPtrTests();
-	void RunGCHeapTests();
+	void RunGCHeapTests();*/
 
 private:
 	void TestSharedPtr();
@@ -22,6 +24,6 @@ private:
 	void TestRawPtr();
 
 private:
-	GC::GarbageCollector& gc;
+	//GC::GarbageCollector& gc;
 	Timer* timer;
 };

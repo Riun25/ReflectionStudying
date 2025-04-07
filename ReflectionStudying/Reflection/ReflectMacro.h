@@ -36,7 +36,6 @@ namespace reflect
 		for (const auto& func : _typeDesc->functionVec) { \
 			RPCSystem::GetInstance().RegisterFunction(_typeDesc->name, func.name, func.invoker); \
 		} \
-		GC::GarbageCollector::GetInstance().RegisterType(_typeDesc); /* GC µî·Ï */ \
 	}
 
 } // namespace reflect

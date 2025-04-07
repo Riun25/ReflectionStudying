@@ -10,7 +10,7 @@ namespace reflect
 	//A type descriptor for vector<>
 	class TypeDescriptor_StdVector : public TypeDescriptor
 	{
-	private:
+	public:
 		TypeDescriptor* itemType; // 생성자에서 초기화해주기 위한 내부 선언
 		// 함수 포인터를 가져오기 위한 변수 선언
 		size_t(*GetSize)(const void*);
@@ -42,30 +42,7 @@ namespace reflect
 			}
 		}
 
-		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const override
-		{
-			size_t numItems = GetSize(_obj);
-			for (size_t i = 0; i < numItems; ++i)
-			{
-				const void* item = GetItem(_obj, i);
-				itemType->Mark(item, _markedObjects);
-			}
-		}
-
-		virtual void Delete(void* _obj) const override
-		{
-			if (_obj == nullptr)
-			{
-				return;
-			}
-
-			size_t numItems = GetSize(_obj);
-			for (size_t i = 0; i < numItems; ++i)
-			{
-				const void* item = GetItem(_obj, i);
-				itemType->Delete(const_cast<void*>(item));
-			}
-		}
+		virtual bool IsPrimitive() const override { return true; }
 
 		template <typename ItemType>
 		TypeDescriptor_StdVector(ItemType*)

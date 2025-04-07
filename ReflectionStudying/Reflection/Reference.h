@@ -37,25 +37,6 @@ namespace reflect
 			std::cout << " }";
 		}
 
-		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const override
-		{
-			const void* item = GetItem(_obj);
-			if (item != nullptr)
-			{
-				itemType->Mark(item, _markedObjects);
-			}
-		}
-
-		virtual void Delete(void* _obj) const override
-		{
-			void** ptr = static_cast<void**>(_obj);
-			if (*ptr != nullptr)
-			{
-				delete* ptr;
-				*ptr = nullptr;
-			}
-		}
-
 		template <typename ItemType>
 		TypeDescriptor_RawPtr(ItemType*)
 			:TypeDescriptor("std::raw_ptr<>", sizeof(ItemType)), itemType(TTypeResolver<ItemType>::Get())
@@ -87,7 +68,6 @@ namespace reflect
 		TypeDescriptor* itemType; // 생성자에서 초기화해주기 위한 내부 선언
 		// 함수 포인터를 가져오기 위한 변수 선언
 		const void* (*GetItem)(const void*);
-		void (*DeleteFunc)(void*); // 삭제 함수 포인터 추가
 
 	public:
 		virtual std::string GetFullName() const override
@@ -110,24 +90,6 @@ namespace reflect
 			std::cout << " }";
 		}
 
-		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const override
-		{
-			const void* item = GetItem(_obj);
-			if (item != nullptr)
-			{
-				itemType->Mark(item, _markedObjects);
-			}
-		}
-
-		virtual void Delete(void* _obj) const override
-		{
-			if (_obj == nullptr)
-			{
-				return;
-			}
-			DeleteFunc(_obj); // 저장된 삭제 함수 호출
-		}
-
 		template <typename ItemType>
 		TypeDescriptor_StdUniquePtr(ItemType*)
 			:TypeDescriptor("std::unique_ptr<>", sizeof(std::unique_ptr<ItemType>)), itemType(TTypeResolver<ItemType>::Get())
@@ -137,13 +99,7 @@ namespace reflect
 					const auto& _ptr = *(const std::unique_ptr<ItemType>*) _ptr;
 					return _ptr.get();
 				};
-
-			DeleteFunc = [](void* _obj)
-				{
-					std::unique_ptr<ItemType>* ptr(static_cast<std::unique_ptr<ItemType>*>(_obj));
-					ptr->reset();
-				};
-		}
+		};
 	};
 
 	//일반적인 T가 아니라 std::unique_ptr<T>일 때만 사용되는 특수화된 버전
@@ -167,7 +123,6 @@ namespace reflect
 		TypeDescriptor* itemType; // 생성자에서 초기화해주기 위한 내부 선언
 		// 함수 포인터를 가져오기 위한 변수 선언
 		const void* (*GetItem)(const void*);
-		void (*DeleteFunc)(void*); // 삭제 함수 포인터 추가
 
 	public:
 		virtual std::string GetFullName() const override
@@ -190,42 +145,6 @@ namespace reflect
 			std::cout << " }";
 		}
 
-		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const override
-		{
-			if (_obj == nullptr)
-			{
-				return;
-			}
-			
-			// shared_ptr<ItemType>로 변환
-			const auto& sptr = *reinterpret_cast<const std::shared_ptr<void>*>(_obj);
-
-			if (sptr == nullptr)  // shared_ptr이 유효한지 확인
-			{
-				return;
-			}
-
-			const void* item = GetItem(_obj);  // 저장된 실제 객체 가져오기
-			// 이미 방문한 객체인지 확인
-			if (item == nullptr || _markedObjects.find(item) != _markedObjects.end())
-			{
-				return;
-			}
-
-			_markedObjects.insert(item);
-
-			itemType->Mark(item, _markedObjects);
-		}
-
-		virtual void Delete(void* _obj) const override
-		{
-			if (_obj == nullptr)
-			{
-				return;
-			}
-			DeleteFunc(_obj); // 저장된 삭제 함수 호출
-		}
-
 		template <typename ItemType>
 		TypeDescriptor_StdSharedPtr(ItemType*)
 			:TypeDescriptor("std::shared_ptr<>", sizeof(std::shared_ptr<ItemType>)), itemType(TTypeResolver<ItemType>::Get())
@@ -234,12 +153,6 @@ namespace reflect
 				{
 					const auto& _ptr = *(const std::shared_ptr<ItemType>*) _ptr;
 					return _ptr.get();
-				};
-
-			DeleteFunc = [](void* _obj)
-				{
-					std::shared_ptr<ItemType>* ptr(static_cast<std::shared_ptr<ItemType>*>(_obj));
-					ptr->reset();
 				};
 		}
 	};
@@ -286,17 +199,6 @@ namespace reflect
 			}
 			std::cout << " }";
 		}
-
-		virtual void Mark(const void* _obj, std::unordered_set<const void*>& _markedObjects) const override
-		{
-			const void* item = GetItem(_obj);
-			if (item != nullptr)
-			{
-				itemType->Mark(item, _markedObjects);
-			}
-		}
-
-		virtual void Delete(void* _obj) const override {}
 
 		template <typename ItemType>
 		TypeDescriptor_StdWeakPtr(ItemType*)

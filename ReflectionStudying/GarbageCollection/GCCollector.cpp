@@ -1,122 +1,221 @@
 #include "GCCollector.h"
-
-void GC::GarbageCollector::RegisterType(reflect::TypeDescriptor* typeDesc)
-{
-	registeredTypes.insert(typeDesc);
-}
-
-void GC::GarbageCollector::Allocate(void* _obj, reflect::TypeDescriptor* _typeDesc)
-{
-	heap[_obj] = _typeDesc; // 객체와 타입 디스크립터 저장
-}
-
-void GC::GarbageCollector::AddRoot(void* _root)
-{
-	roots.insert(_root); // 루트 추가
-}
-
-void GC::GarbageCollector::RemoveRoot(void* _root)
-{
-	roots.erase(_root);
-}
-
-void GC::GarbageCollector::ClearRoots()
-{
-	roots.clear();
-}
-
-void GC::GarbageCollector::Mark()
-{
-	/// [성능측정] std::cout << "\nStarting Marking...\n";
-	for (void* root : roots) 
-	{
-		if (markedObjects.find(root) == markedObjects.end()) 
-		{
-			auto it = heap.find(root);
-			if (it != heap.end()) 
-			{
-				reflect::TypeDescriptor* typeDesc = it->second;
-				typeDesc->Mark(root, markedObjects); // 리플렉션 정보를 사용하여 마킹 수행
-			}
-		}
-	}
-}
-
-void GC::GarbageCollector::ConcurrentMark()
-{
-	//size_t numThreads = std::thread::hardware_concurrency();
-	//markQueues.resize(numThreads);
-
-	//// 루트를 각 스레드의 작업 큐에 분배
-	//size_t index = 0;
-	//for (void* root : roots)
-	//{
-	//	markQueues[index % numThreads].push(root);
-	//	++index;
-	//}
-
-	//// 각 스레드에서 마킹 작업 수행
-	//std::vector<std::thread> threads; // <- 음 이거 매우 별론데... 매번 할당..?
-	//for (size_t i = 0; i < numThreads; ++i)
-	//{
-	//	threads.emplace_back([this, i]() // <-이거 무슨 문법이지?
-	//		{
-	//			while (markQueues[i].empty() == true)
-	//			{
-	//				void* obj = markQueues[i].front();
-	//				markQueues[i].pop();
-
-	//				// 이미 마킹된 경우 건너뜀
-	//				{
-	//					std::lock_guard<std::mutex> lock(markedObjectsMutex);
-	//					if (markedObjects.find(obj) != markedObjects.end())
-	//					{
-	//						continue;
-	//					}
-	//					markedObjects.insert(obj);
-	//				}
-
-	//				// 리플렉션 정보를 사용하여 참조된 객체 추가
-	//				reflect::TypeDescriptor* typeDesc = heap[obj];
-	//				typeDesc->Mark(obj, markedObjects, markQueues[i]);
-	//			}
-	//		});
-	//}
-	//for (auto& thread : threads)
-	//{
-	//	thread.join();
-	//}
-
-}
-
-void GC::GarbageCollector::Sweep(bool _isDump)
-{
-	for (auto it = heap.begin(); it != heap.end(); ) 
-	{
-		if (markedObjects.find(it->first) == markedObjects.end()) 
-		{
-			if (_isDump == true)
-			{
-				std::cout << "Collecting: " << it->first << "\n";
-			}
-			reflect::TypeDescriptor* typeDesc = it->second;
-			typeDesc->Delete(it->first); // 리플렉션 정보를 사용하여 객체 삭제
-			it = heap.erase(it);         // 힙에서 제거
-		}
-		else 
-		{
-			++it;
-		}
-	}
-
-	markedObjects.clear(); // 다음 GC를 위해 초기화
-}
-
-void GC::GarbageCollector::Collect(bool _isDump)
-{
-	/// [성능측정] std::cout << "\nStarting Garbage Collection...\n";
-	Mark();
-	//ConcurrentMark();
-	Sweep(_isDump);
-	/// [성능측정] std::cout << "Garbage Collection Complete.\n\n";
-}
+//
+//struct Node;
+//
+//void GC::GarbageCollector::Collect(bool _isDump)
+//{
+//	/*std::cout << "Registered Objects:\n";
+//	for (const auto& [obj, typeDesc] : objectManager->GetAllObjects()) {
+//		std::cout << "  Object: " << obj << ", Type: " << typeDesc->GetFullName() << "\n";
+//	}*/
+//
+//	/// [성능측정] std::cout << "\nStarting Garbage Collection...\n";
+//	Mark();
+//	//ConcurrentMark();
+//	Sweep(_isDump);
+//	/// [성능측정] std::cout << "Garbage Collection Complete.\n\n";
+//}
+//
+//void GC::GarbageCollector::Collect_LimitPerFrame(bool _isDump)
+//{
+//	Mark();
+//	Sweep_LimitPerFrame(_isDump);
+//}
+//
+//
+//void GC::GarbageCollector::Mark()
+//{
+//	/// [성능측정] std::cout << "\nStarting Marking...\n";
+//	if (objectManager->GetRootObjects().empty())
+//	{
+//		//std::cerr << "Warning: Root set is empty. No objects will be marked.\n";
+//		return;
+//	}
+//
+//
+//	for (void* root : objectManager->GetRootObjects())
+//	{
+//		for (auto & e : markedObjects)
+//		{
+//			if (e == root)
+//			{
+//				continue;
+//			}
+//			markedObjects.emplace_back(root);
+//			MarkObject(root);
+//		}
+//	}
+//}
+//
+//void GC::GarbageCollector::MarkObject(void* _obj)
+//{
+//	// 이미 마킹된 경우 건너뜀
+//	for (auto& e : markedObjects)
+//	{
+//		if (e == _obj)
+//		{
+//			continue;
+//		}
+//	}
+//
+//	markedObjects.emplace_back(_obj);
+//	std::cout << "[Marking] Object: " << _obj << "\n";
+//
+//	// 참조된 객체 탐색
+//	reflect::TypeDescriptor* baseTypeDesc;
+//
+//	auto it = objectManager->GetAllObjects().find(_obj);
+//	if (it != objectManager->GetAllObjects().end())
+//	{
+//		baseTypeDesc = it->second;
+//	}
+//	else
+//	{
+//		std::cerr << "Error: Object not found in ObjectManager.\n";
+//		return;
+//	}
+//
+//	// TypeDescriptor_SubClass로 다운캐스팅
+//	auto* typeDesc = dynamic_cast<reflect::TypeDescriptor_SubClass*>(baseTypeDesc);
+//	if (!typeDesc)
+//	{
+//		std::cerr << "Error: TypeDescriptor is not a subclass type.\n";
+//		return;
+//	}
+//
+//	// 멤버 변수 추적 (리플렉션 정보 활용)
+//	for (const auto& member : typeDesc->memberVec)
+//	{
+//		void* memberPtr = static_cast<char*>(_obj) + member.offset;
+//
+//		auto* vectorType = dynamic_cast<reflect::TypeDescriptor_StdVector*>(member.type);
+//		if (vectorType)
+//		{
+//			size_t numItems = vectorType->GetSize(memberPtr);
+//			for (size_t i = 0; i < numItems; ++i)
+//			{
+//				const void* item = vectorType->GetItem(memberPtr, i);
+//
+//				// Primitive 타입 무시
+//				if (vectorType->itemType->IsPrimitive() == false)
+//				{
+//					MarkObject(const_cast<void*>(item));
+//				}
+//			}
+//		}
+//		else if (member.type->IsPrimitive() == false && objectManager->GetAllObjects().count(memberPtr))
+//		{
+//			MarkObject(memberPtr);
+//		}
+//	}
+//}
+//
+//void GC::GarbageCollector::Sweep(bool _isDump)
+//{
+//	auto& allObjects = objectManager->GetAllObjects();
+//
+//	if (markedObjects.empty())
+//	{
+//		//std::cerr << "Warning: No objects were marked. All registered objects will be deleted.\n";
+//		markedObjects.clear(); // 다음 GC를 위해 초기화
+//		return;
+//	}
+//
+//	// 1. 삭제할 객체 목록 수집
+//	std::vector<void*> toDelete;
+//	{
+//		std::lock_guard<std::mutex> lock(sweepMutex);
+//		for (auto it = allObjects.begin(); it != allObjects.end();)
+//		{
+//			if (markedObjects.find(it->first) == markedObjects.end())
+//			{
+//				toDelete.push_back(it->first);
+//				++it;
+//			}
+//			else
+//			{
+//				++it;
+//			}
+//		}
+//	}
+//
+//	// 2. 멀티스레드로 삭제 작업 병렬 처리
+//	const size_t chunkSize = (toDelete.size() + numThreads - 1) / numThreads;
+//	std::vector<std::thread> threads;
+//
+//	for (size_t t = 0; t < numThreads; ++t)
+//	{
+//		threads.emplace_back([&, t]()
+//			{
+//				const size_t start = t * chunkSize;
+//				const size_t end = std::min(start + chunkSize, toDelete.size());
+//
+//				for (size_t i = start; i < end; ++i)
+//				{
+//					void* obj = toDelete[i];
+//					if (_isDump)
+//					{
+//						std::lock_guard<std::mutex> lock(sweepMutex);
+//						std::cout << "[Sweeping] Deleting Object: " << obj
+//							<< ", Type: " << allObjects[obj]->GetFullName() << "\n";
+//					}
+//
+//					// 자식 객체 재귀적 삭제
+//					objectManager->DeleteChildren(obj, allObjects[obj]);
+//
+//					// 객체 메모리 해제
+//					delete static_cast<Node*>(obj);
+//				}
+//			});
+//	}
+//
+//	// 모든 스레드 작업 완료 대기
+//	for (auto& thread : threads)
+//	{
+//		thread.join();
+//	}
+//
+//	// 3. ObjectManager에서 삭제된 객체 제거
+//	{
+//		std::lock_guard<std::mutex> lock(sweepMutex);
+//		for (void* obj : toDelete)
+//		{
+//			objectManager->DeregisterObject(obj);
+//		}
+//	}
+//
+//	markedObjects.clear(); // 다음 GC를 위해 초기화
+//}
+//
+//void GC::GarbageCollector::Sweep_LimitPerFrame(bool _isDump)
+//{
+//	auto& allObjects = objectManager->GetAllObjects();
+//	size_t deleteCount = 0;
+//
+//	for (auto it = allObjects.begin(); it != allObjects.end(); )
+//	{
+//		if (markedObjects.find(it->first) == markedObjects.end())
+//		{
+//			if (_isDump)
+//			{
+//				std::cout << "[Sweeping] Deleting Object: " << it->first
+//					<< ", Type: " << it->second->GetFullName() << "\n";
+//			}
+//
+//			objectManager->DeleteChildren_LimitPerFrame(it->first, it->second);
+//			objectManager->DeregisterObject_LimitPerFrame(it->first); // 등록 해제
+//			delete static_cast<Node*>(it->first);       // 메모리 해제
+//			it = allObjects.erase(it);                  // map에서 제거
+//
+//			if (deleteCount >= maxDeletePerFrame)
+//			{
+//				break;
+//			}
+//		}
+//		else
+//		{
+//			++it;
+//		}
+//	}
+//	markedObjects.clear(); // 다음 GC를 위해 초기화
+//}

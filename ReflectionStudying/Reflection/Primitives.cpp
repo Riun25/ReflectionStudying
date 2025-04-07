@@ -18,12 +18,7 @@ namespace reflect
 		{
 			std::cout << "int{" << *(const int*)_obj << "}";
 		}
-
-		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
-		{ }
-
-		virtual void Delete(void* _obj) const override
-		{ }
+		virtual bool IsPrimitive() const override { return true; }
 	};
 
 	template <>
@@ -43,14 +38,7 @@ namespace reflect
 		{
 			std::cout << "float{" << *(const float*)_obj << "}";
 		}
-
-		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
-		{
-		}
-
-		virtual void Delete(void* _obj) const override
-		{
-		}
+		virtual bool IsPrimitive() const override { return true; }
 	};
 
 	template <>
@@ -70,14 +58,7 @@ namespace reflect
 		{
 			std::cout << "double{" << *(const double*)_obj << "}";
 		}
-
-		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
-		{
-		}
-
-		virtual void Delete(void* _obj) const override
-		{
-		}
+		virtual bool IsPrimitive() const override { return true; }
 	};
 
 	template <>
@@ -97,14 +78,7 @@ namespace reflect
 		{
 			std::cout << "char{" << *(const char*)_obj << "}";
 		}
-
-		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
-		{
-		}
-
-		virtual void Delete(void* _obj) const override
-		{
-		}
+		virtual bool IsPrimitive() const override { return true; }
 	};
 
 	template <>
@@ -124,14 +98,7 @@ namespace reflect
 		{
 			std::cout << "bool{" << *(const bool*)_obj << "}";
 		}
-
-		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
-		{
-		}
-
-		virtual void Delete(void* _obj) const override
-		{
-		}
+		virtual bool IsPrimitive() const override { return true; }
 	};
 
 	template <>
@@ -151,12 +118,7 @@ namespace reflect
 		{
 			std::cout << "std::string{" << *(const std::string*)_obj << "}";
 		}
-
-		virtual void Mark(const void* /*_obj*/, std::unordered_set<const void*>& /*_markedObjects*/) const override
-		{ }
-
-		virtual void Delete(void* _obj) const override
-		{ }
+		virtual bool IsPrimitive() const override { return true; }
 	};
 
 	template <>

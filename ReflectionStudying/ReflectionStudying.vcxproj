@@ -129,7 +129,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GarbageCollection\GCCollector.cpp" />
     <ClCompile Include="GarbageCollection\ObjectManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -140,8 +139,8 @@
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GarbageCollection\GCCollector.h" />
     <ClInclude Include="GarbageCollection\ObjectManager.h" />
+    <ClInclude Include="GarbageCollection\TypeDisposerRegistry.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Reflection\Descriptor.h" />
     <ClInclude Include="Reflection\ReflectMacro.h" />

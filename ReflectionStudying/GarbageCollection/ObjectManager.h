@@ -30,7 +30,7 @@ public:
 
 private:
 	std::vector<ObjectMetaData> objects; // 관리 중인 객체 목록
-	const int threadCount =16; // 사용할 스레드 개수
+	const int threadCount =12; // 사용할 스레드 개수
 	void SweepWithErase();
 	void SweepWithNewVector();
 	void SweepWithThreads();

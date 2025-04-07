@@ -43,7 +43,7 @@ int main()
 	// 3. GC 성능을 측정하기
 	for (int i = 0; i < 10; i++)
 	{
-		test->RunGCTimerTest(objectManager, 100000);
+		//test->RunGCTimerTest(objectManager, 100000);
 	}
 
 	std::cout << "=============================\n";

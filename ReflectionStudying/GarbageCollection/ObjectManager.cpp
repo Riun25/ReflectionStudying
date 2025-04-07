@@ -1,6 +1,7 @@
 #pragma once
 #include "ObjectManager.h"
 #include "../Node.h"
+#include "TypeDisposerRegistry.h"
 
 class reflect::TypeDescriptor_StdVector;
 
@@ -92,7 +93,7 @@ void ObjectManager::Sweep()
 	}
 
 	// 마킹된 객체 비율
-	double markedRatio = static_cast<double>(markedCount) / totalObjects;
+	float markedRatio = static_cast<float>(markedCount) / totalObjects;
 
 	// 처리 방식 결정
 	if (markedRatio > 0.8) 
@@ -118,7 +119,7 @@ void ObjectManager::SweepWithErase()
 	{
 		if (it->isMarked == false)
 		{
-			delete static_cast<char*>(it->object); // 메모리 해제
+			TypeDisposerRegistry::Dispose(it->type, it->object); // 메모리 해제
 			it = objects.erase(it);
 		}
 		else
@@ -137,7 +138,7 @@ void ObjectManager::SweepWithNewVector()
 	{
 		if (metaData.isMarked == false)
 		{
-			delete static_cast<char*>(metaData.object); // 메모리 해제
+			TypeDisposerRegistry::Dispose(metaData.type, metaData.object); // 메모리 해제
 		}
 		else
 		{
@@ -164,7 +165,7 @@ void ObjectManager::SweepWithThreads()
 		{
 			if (!objects[i].isMarked) 
 			{
-				delete static_cast<Node*>(objects[i].object); // 메모리 해제
+				TypeDisposerRegistry::Dispose(objects[i].type, objects[i].object); // 메모리 해제
 				objects[i].object = nullptr;
 			}
 			else 

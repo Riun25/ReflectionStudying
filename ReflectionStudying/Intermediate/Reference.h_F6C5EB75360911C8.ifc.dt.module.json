@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": ".\\Intermediate\\Reference.obj",
+            "outputs": [
+                ".\\Intermediate\\Reference.h_F6C5EB75360911C8.ifc.dt.module.json",
+                ".\\Intermediate\\Reference.h_F6C5EB75360911C8.ifc.dt.d.json",
+                ".\\Intermediate\\Reference.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "C:\\Users\\riun\\source\\repos\\ReflectionStudying\\ReflectionStudying\\Reflection\\Reference.h",
+                    "source-path": "c:\\users\\riun\\source\\repos\\reflectionstudying\\reflectionstudying\\reflection\\reference.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

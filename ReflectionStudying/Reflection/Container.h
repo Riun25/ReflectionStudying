@@ -50,13 +50,24 @@ namespace reflect
 		{
 			GetSize = [](const void* _vecPtr) -> size_t
 				{
+					// 간단한 디버그 출력
 					const auto& vec = *(const std::vector<ItemType>*) _vecPtr;
+					//std::cout << "Vec addr (container): " << _vecPtr << std::endl;
+					//std::cout << "Vec data addr       : " << vec.data() << std::endl;
+					//std::cout << "Vec size            : " << vec.size() << std::endl;
 					return vec.size();
 				};
 			GetItem = [](const void* _vecPtr, size_t _index) -> const void*
 				{
 					const auto& _vec = *(const std::vector<ItemType>*) _vecPtr;
-					return &_vec[_index];
+					if constexpr (std::is_pointer<ItemType>::value)
+					{
+						return _vec[_index];
+					}
+					else
+					{
+						return &_vec[_index];
+					}
 				};
 		}
 	};

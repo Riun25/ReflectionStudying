@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": ".\\Intermediate\\Container.h.obj",
+            "outputs": [
+                "C:\\Users\\riun\\source\\repos\\ReflectionStudying\\ReflectionStudying\\Intermediate\\vc143.pdb",
+                ".\\Intermediate\\",
+                "C:\\Users\\riun\\source\\repos\\ReflectionStudying\\ReflectionStudying\\Intermediate\\Container.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Reflection\\Container.h",
+                    "source-path": "c:\\users\\riun\\source\\repos\\reflectionstudying\\reflectionstudying\\reflection\\container.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

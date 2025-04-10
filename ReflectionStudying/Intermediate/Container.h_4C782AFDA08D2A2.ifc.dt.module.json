@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": ".\\Intermediate\\Container.obj",
+            "outputs": [
+                ".\\Intermediate\\Container.h_4C782AFDA08D2A2.ifc.dt.module.json",
+                ".\\Intermediate\\Container.h_4C782AFDA08D2A2.ifc.dt.d.json",
+                ".\\Intermediate\\Container.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "C:\\Users\\riun\\source\\repos\\ReflectionStudying\\ReflectionStudying\\Reflection\\Container.h",
+                    "source-path": "c:\\users\\riun\\source\\repos\\reflectionstudying\\reflectionstudying\\reflection\\container.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

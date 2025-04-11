@@ -44,6 +44,8 @@ namespace reflect
 
 		virtual bool IsPrimitive() const override { return true; }
 
+
+
 		template <typename ItemType>
 		TypeDescriptor_StdVector(ItemType*)
 			:TypeDescriptor("std::vector<>", sizeof(std::vector<ItemType>)), itemType(TTypeResolver<ItemType>::Get())

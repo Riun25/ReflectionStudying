@@ -71,11 +71,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>.\Bin</OutDir>
+    <OutDir>.\BinS</OutDir>
     <IntDir>.\Intermediate</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>.\Bin</OutDir>
+    <OutDir>.\Bin_D</OutDir>
     <IntDir>.\Intermediate</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -152,8 +152,8 @@
   <ItemGroup>
     <ClInclude Include="GarbageCollection\Object.h" />
     <ClInclude Include="GarbageCollection\ObjectManager.h" />
-    <ClInclude Include="GarbageCollection\TypeDisposerRegistry.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="ObjectInfo.h" />
     <ClInclude Include="Reflection\Descriptor.h" />
     <ClInclude Include="Reflection\ReflectMacro.h" />
     <ClInclude Include="Reflection\Resolver.h" />

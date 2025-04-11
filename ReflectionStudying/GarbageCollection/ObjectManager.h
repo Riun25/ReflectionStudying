@@ -1,8 +1,10 @@
 #pragma once
 #include "Object.h "
 #include <thread>
-#include <queue>
 #include <unordered_set>
+#include "../ObjectInfo.h"
+#define THREAD_COUNT 8
+struct Node;
 
 class ObjectManager
 {
@@ -11,27 +13,17 @@ public:
 	~ObjectManager() {}
 
 public:
-	void RegisterObject(void* _obj, reflect::TypeDescriptor* _typeDesc, std::unordered_set<void*>& _visited);
-	void MarkAll(const std::vector<void*>& roots);
-	void Mark(void* _root);
-	void MarkTest(int _numRoot);
-	void Sweep();
+	void Mark(const std::string& _typeName, ObjectInfo* _obj);
+	void Sweep(std::vector<ObjectInfo*>* _nodes);
+	void MarkwithThread(const std::string& _typeName, std::vector<ObjectInfo*>* _nodes, int _count);
+	void SweepwithThread(std::vector<ObjectInfo*>* _nodes);
 
-	std::vector<ObjectSlot>& GetObjects() { return objects; }
-	std::vector<ObjectSlot*>& GetpObjects() { return objects2; }
-	void ClearObject() { objects.clear(); }
-	void PrintObject();
 	void CountMarkObject();
+	std::atomic<int> markedCount = 0;
 
-	void FilledObjIdx();
+	void RegisterTypeDiscriptor(const std::string& _typeName, reflect::TypeDescriptor_SubClass* _s);
 private:
-
-	std::vector<ObjectSlot> objects; // 관리 중인 객체 목록
-	std::vector<ObjectSlot*> objects2; // 관리 중인 객체 목록
-	const int threadCount = 16; // 사용할 스레드 개수
-	int markedCount = 0;
-	void SweepWithErase();
-	void SweepWithNewVector(int _markedCount);
-	void SweepWithThreads();
-	std::unordered_map<void*, ObjectSlot*> objectIndex; // <- 마킹 속도를 최적화하기 위해 넣음
+	// 오브젝트 스트링으로 리플렉션 정보 찾기
+	reflect::TypeDescriptor_SubClass* FindTypeDescriptor(const std::string& _typeName);
+	std::vector<std::pair<std::string, reflect::TypeDescriptor_SubClass*>> testVec;
 };

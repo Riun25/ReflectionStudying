@@ -1,7 +1,9 @@
 #pragma once
 #include <atomic>
 #include "../Reflection/Container.h"
+#include "../Reflection/ReflectMacro.h"
 
+// 미사용 구조체
 struct ObjectSlot
 {
 	void* object;
@@ -61,4 +63,5 @@ struct ObjectSlot
 	{
 		return isMarkedFlag.test(std::memory_order_relaxed);
 	}
+
 };

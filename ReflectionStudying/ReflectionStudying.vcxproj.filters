@@ -68,10 +68,10 @@
     <ClInclude Include="GarbageCollection\ObjectManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="GarbageCollection\TypeDisposerRegistry.h">
+    <ClInclude Include="GarbageCollection\Object.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="GarbageCollection\Object.h">
+    <ClInclude Include="ObjectInfo.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

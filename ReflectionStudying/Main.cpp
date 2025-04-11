@@ -27,9 +27,12 @@ private:
 
 int main()
 {
-	std::cout << "Size of Node: " << sizeof(Node) << " bytes\n";
-
-
+	std::cout << "Thread Num: " << THREAD_COUNT;
+#ifdef USE_MULTITHREAD
+	std::cout << " Using Multi-Thread\n";
+#else
+	std::cout << " Using Single-Thread\n";
+#endif
 	ObjectManager* objectManager = new ObjectManager();
 
 	//1. 임의 클래스의 함수 리스트 및 멤버 변수 리스트 출력하기
@@ -61,27 +64,20 @@ int main()
 	//RPCSystem::GetInstance().Invoke("Node", "Add", &node,
 	//	{ 42, 24 });
 
-
-	
-
-
-
-
-
 	for (int i = 1; i < 11; ++i)
 	{
-		std::cout << "==============[ " << i << " ]============== = \n";
+		std::cout << "==============[ " << i << " ]=============== \n";
 
 		//test->RunGCRootsTest(objectManager, numRoots, numNodes);
-		test->RunGCRootsTest(objectManager, i);
+		test->RunGCRootsTest(objectManager);
 
 	}
 
 	delete test;
 	delete objectManager;
 
-	//std::cout << "Press Enter to exit...\n";
-	//std::cin.get();  // 콘솔 대기
+	std::cout << "Press Enter to exit...\n";
+	std::cin.get();  // 콘솔 대기
 
 	return 0;
 }

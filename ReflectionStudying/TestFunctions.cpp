@@ -1,7 +1,7 @@
 #pragma once
 #include "TestFunctions.h"
 
-#define USE_MULTITHREAD
+
 
 class TypeDisposerRegistry;
 struct Node;
@@ -130,11 +130,15 @@ void TestFunctions::RunGCRootsTest(ObjectManager* _objectManager, int _count)
 		_objectManager->Mark("Node", pNodes[i]);
 	}
 #endif
+
+#ifdef DEVIDE_PRINT
 	timer->Stop();
 	std::cout << "GC Mark Time: " << timer->ElapsedMilliseconds() << " ms\n";
-	std::cout << _objectManager->markedCount << "\n";
+	
 	timer->Start();
-
+#else
+#endif
+	std::cout << _objectManager->markedCount << "\n";
 #ifdef USE_MULTITHREAD
 	_objectManager->SweepwithThread(&pNodes); // 첫 번째 GC 실행
 #else
@@ -142,5 +146,9 @@ void TestFunctions::RunGCRootsTest(ObjectManager* _objectManager, int _count)
 #endif
 
 	timer->Stop();
+#ifdef DEVIDE_PRINT
 	std::cout << "GC Sweep Time: " << timer->ElapsedMilliseconds() << " ms\n";
+#else
+	std::cout << "GC Execution Time: " << timer->ElapsedMilliseconds() << " ms\n";
+#endif
 }

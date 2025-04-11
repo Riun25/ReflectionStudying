@@ -46,27 +46,10 @@ void ObjectManager::Mark(const std::string& _typeName, ObjectInfo* _obj)
 void ObjectManager::Sweep(std::vector<ObjectInfo*>* _nodes)
 {
 	std::vector<ObjectInfo*>& nodes = *_nodes;
-	int objectSize = static_cast<int>(nodes.size());
 
-	std::vector<ObjectInfo*> survivors;
-	survivors.reserve(objectSize); // 생존자만 따로 저장
-
-	for (int i = 0; i < objectSize; ++i)
-	{
-		ObjectInfo* current = nodes[i];
-		if (current->isMarked)
-		{
-			survivors.push_back(current); // 생존자만 저장
-		}
-		else
-		{
-			delete current; // 제거 대상은 해제
-			current = nullptr;
-		}
-	}
-
-	survivors.reserve(nodes.size() - markedCount);
-	nodes = std::move(survivors); // 생존자만 남기기
+	nodes.erase(std::remove_if(nodes.begin(), nodes.end(),
+		[](ObjectInfo* obj) {if (!obj->isMarked) { delete obj; return true; }return false; }),
+		nodes.end());
 }
 
 void ObjectManager::MarkwithThread(const std::string& _typeName, std::vector<ObjectInfo*>* _nodes, int _count)
@@ -120,6 +103,7 @@ void ObjectManager::SweepwithThread(std::vector<ObjectInfo*>* _nodes)
 				for (int i = start; i < end; ++i)
 				{
 					ObjectInfo* current = nodes[i];
+
 					if (current->isMarked)
 					{
 						threadSurvivors[t].push_back(current);
@@ -140,13 +124,13 @@ void ObjectManager::SweepwithThread(std::vector<ObjectInfo*>* _nodes)
 	std::vector<ObjectInfo*> finalSurvivors;
 	finalSurvivors.reserve(markedCount);
 
+	int offset = 0;
 	for (int t = 0; t < THREAD_COUNT; ++t)
 	{
 		auto& local = threadSurvivors[t];
-		finalSurvivors.insert(finalSurvivors.end(), local.begin(), local.end()); 
+		std::move(local.begin(), local.end(), finalSurvivors.begin() + offset);
+		offset += static_cast<int>(local.size());
 	}
-	//std::vector<int> a;
-	//a.erase(std::remove(,m,), a.end())
 
 	nodes.reserve(markedCount);
 	nodes = std::move(finalSurvivors);

@@ -3,7 +3,10 @@
 #include <thread>
 #include <unordered_set>
 #include "../ObjectInfo.h"
+//#define USE_MULTITHREAD
 #define THREAD_COUNT 8
+//#define DEVIDE_PRINT
+
 struct Node;
 
 class ObjectManager

@@ -3,9 +3,6 @@
 #include "TestFunctions.h"
 #include <vector>
 
-
-
-
 struct Node;
 
 class MultiParamClass
@@ -27,8 +24,8 @@ private:
 
 int main()
 {
-	std::cout << "Thread Num: " << THREAD_COUNT;
 #ifdef USE_MULTITHREAD
+	std::cout << "Thread Num: " << THREAD_COUNT;
 	std::cout << " Using Multi-Thread\n";
 #else
 	std::cout << " Using Single-Thread\n";

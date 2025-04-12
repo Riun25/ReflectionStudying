@@ -14,7 +14,7 @@ void ObjectManager::Mark(const std::string& _typeName, ObjectInfo* _obj)
 	++markedCount;
 
 	auto* typeDesc = FindTypeDescriptor(_obj->TypeName);
-		//dynamic_cast<reflect::TypeDescriptor_SubClass*>(it->second.second);
+
 	if (typeDesc == nullptr){return;}
 
 	for (const auto& member : typeDesc->memberVec)
@@ -23,17 +23,13 @@ void ObjectManager::Mark(const std::string& _typeName, ObjectInfo* _obj)
 		if (vectorType != nullptr) // 벡터 타입이라면 재귀적으로 진행
 		{
 			void* memberPtr = static_cast<char*>(static_cast<void*>(_obj)) + member.offset;
-			// 디버깅용
-			//Node* node = static_cast<Node*>(_root);
-			//std::cout << "children field addr : " << &(node->children) << "\n";
-			//std::cout << "offset-applied addr : " << static_cast<void*>(static_cast<char*>(_root) + member.offset) << "\n";
-			
+
 			// 벡터 데이터 접근
 			size_t numItems = vectorType->GetSize(memberPtr);
 			for (size_t i = 0; i < numItems; ++i)
 			{
 				ObjectInfo* child = static_cast<ObjectInfo*>(const_cast<void*>(vectorType->GetItem(memberPtr, i)));
-				//std::cout << "void* child : " << child << "\n";
+
 				if (vectorType->itemType->IsPrimitive() == false) // Primitive 타입 무시
 				{
 					Mark(_obj->TypeName, child);
@@ -68,7 +64,7 @@ void ObjectManager::MarkwithThread(const std::string& _typeName, std::vector<Obj
 			{
 				for (int j = start; j < end; ++j)
 				{
-					this->Mark(_typeName, allNodes[j]); // 기존 재귀 마크 함수 호출
+					this->Mark(_typeName, allNodes[j]);
 				}
 			});
 	}
@@ -85,7 +81,7 @@ void ObjectManager::SweepwithThread(std::vector<ObjectInfo*>* _nodes)
 	int chunkSize = (objectSize + THREAD_COUNT - 1) / THREAD_COUNT;
 
 	std::thread threads[THREAD_COUNT];
-	std::vector<ObjectInfo*> threadSurvivors[THREAD_COUNT]; // 생존자 배열
+	std::vector<ObjectInfo*> threadSurvivors[THREAD_COUNT];
 
 	// 미리 크기 예약
 	for (int i = 0; i < THREAD_COUNT; ++i)
@@ -137,9 +133,9 @@ void ObjectManager::SweepwithThread(std::vector<ObjectInfo*>* _nodes)
 }
 
 
-void ObjectManager::CountMarkObject()
+void ObjectManager::PrintMarkedNum()
 {
-	std::cout << markedCount << "\t";
+	std::cout << "Marking Count: " << markedCount << "\t";
 }
 
 void ObjectManager::RegisterTypeDiscriptor(const std::string& _typeName, reflect::TypeDescriptor_SubClass* _s)

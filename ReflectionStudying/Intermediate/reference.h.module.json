@@ -5,14 +5,14 @@
         {
             "primary-output": ".\\Intermediate\\Reference.h.obj",
             "outputs": [
-                "C:\\Users\\riun\\source\\repos\\ReflectionStudying\\ReflectionStudying\\Intermediate\\vc143.pdb",
+                "C:\\Users\\user\\source\\repos\\ReflectionStudying\\ReflectionStudying\\Intermediate\\vc143.pdb",
                 ".\\Intermediate\\",
-                "C:\\Users\\riun\\source\\repos\\ReflectionStudying\\ReflectionStudying\\Intermediate\\Reference.h.ifc"
+                "C:\\Users\\user\\source\\repos\\ReflectionStudying\\ReflectionStudying\\Intermediate\\Reference.h.ifc"
             ],
             "provides": [
                 {
                     "logical-name": "Reflection\\Reference.h",
-                    "source-path": "c:\\users\\riun\\source\\repos\\reflectionstudying\\reflectionstudying\\reflection\\reference.h",
+                    "source-path": "c:\\users\\user\\source\\repos\\reflectionstudying\\reflectionstudying\\reflection\\reference.h",
                     "lookup-method": "absolute"
                 }
             ],

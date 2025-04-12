@@ -1,7 +1,5 @@
 #pragma once
 #include "Descriptor.h"
-#include <memory>
-#include <vector>
 
 namespace reflect
 {

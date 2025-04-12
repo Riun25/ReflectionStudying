@@ -1,6 +1,5 @@
 #pragma once
 #include "Descriptor.h"
-#include <iostream>
 
 /* 추가한 타입------------------------------
 int, float, double, char, bool, std::string

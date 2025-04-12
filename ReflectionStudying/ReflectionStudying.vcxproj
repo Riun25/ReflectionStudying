@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>.\BinS</OutDir>
-    <IntDir>.\Intermediate</IntDir>
+    <OutDir>.\Bin\</OutDir>
+    <IntDir>.\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>.\Bin_D</OutDir>
@@ -150,14 +150,13 @@
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GarbageCollection\Object.h" />
     <ClInclude Include="GarbageCollection\ObjectManager.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="ObjectInfo.h" />
+    <ClInclude Include="Reflection\Container_practice.h" />
     <ClInclude Include="Reflection\Descriptor.h" />
     <ClInclude Include="Reflection\ReflectMacro.h" />
     <ClInclude Include="Reflection\Resolver.h" />
-    <ClInclude Include="RPC\ObjectRegistry.h" />
     <ClInclude Include="RPC\RPCSystem.h" />
     <ClInclude Include="TestFunctions.h" />
     <ClInclude Include="Timer.h" />

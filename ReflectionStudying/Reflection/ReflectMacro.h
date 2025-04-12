@@ -2,13 +2,10 @@
 #include "../RPC/RPCSystem.h"
 #include "Container.h"
 #include "Reference.h"
-#include <unordered_set>
-#include <iostream>
 
 // 리플렉션 시스템
 namespace reflect 
 {
-	// 리플렉션 매크로
 #define REFLECT() \
 	friend class reflect::DefaultResolver; \
 	static reflect::TypeDescriptor_SubClass Reflection; \
@@ -38,4 +35,4 @@ namespace reflect
 		} \
 	}
 
-} // namespace reflect
+}

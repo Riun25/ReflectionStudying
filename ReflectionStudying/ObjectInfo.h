@@ -1,5 +1,6 @@
 #pragma once
 #include <atomic>
+
 struct ObjectInfo
 {
 	std::atomic<bool> isMarked = false;

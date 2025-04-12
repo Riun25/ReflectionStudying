@@ -1,6 +1,7 @@
 #pragma once
 #include "Timer.h"
 #include "TestFunctions.h"
+#include "GarbageCollection/ObjectManager.h"
 #include <vector>
 
 struct Node;

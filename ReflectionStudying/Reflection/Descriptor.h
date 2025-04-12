@@ -5,6 +5,7 @@
 #include <functional>
 #include <unordered_set>
 #include <any>
+#include <vector>
 
 namespace reflect
 {

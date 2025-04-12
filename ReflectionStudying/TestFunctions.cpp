@@ -1,9 +1,7 @@
 #pragma once
 #include "TestFunctions.h"
+#include "GarbageCollection/ObjectManager.h"
 
-
-
-class TypeDisposerRegistry;
 struct Node;
 
 TestFunctions::TestFunctions()
@@ -108,12 +106,9 @@ void TestFunctions::RunGCRootsTest(ObjectManager* _objectManager, int _count)
 	size_t numRoots = 10;  // 루트 노드 개수
 	size_t numNodes = 100000; // 전체 노드 개수
 
-	std::vector<Node*> allNodes = CreateRandomRootGraph(_objectManager, numRoots, numNodes, visited, allNodes);
-	std::vector<void*> rootPtrs;
-	rootPtrs.reserve(numRoots);
+	std::vector<Node*> allNodes = CreateRandomRootGraph(_objectManager, numRoots, numNodes, allNodes);
 
-
-	_objectManager->markedCount = 0;
+	_objectManager->ResetMarkCount();
 
 	std::vector<ObjectInfo*> pNodes(numNodes);
 	for (size_t i = 0; i < numNodes; ++i)
@@ -138,11 +133,11 @@ void TestFunctions::RunGCRootsTest(ObjectManager* _objectManager, int _count)
 	timer->Start();
 #else
 #endif
-	std::cout << _objectManager->markedCount << "\n";
+	_objectManager->PrintMarkedNum();
 #ifdef USE_MULTITHREAD
-	_objectManager->SweepwithThread(&pNodes); // 첫 번째 GC 실행
+	_objectManager->SweepwithThread(&pNodes);
 #else
-	_objectManager->Sweep(&pNodes); // 첫 번째 GC 실행
+	_objectManager->Sweep(&pNodes);
 #endif
 
 	timer->Stop();

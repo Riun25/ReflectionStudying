@@ -1,6 +1,7 @@
 ﻿#include "Node.h"
+#include "GarbageCollection/ObjectManager.h"
 
-std::vector<Node*> CreateRandomRootGraph(ObjectManager* _manager, size_t _numRoots, size_t _numNodes, std::unordered_set<void*>& _visited, std::vector<Node*>& _allNodes)
+std::vector<Node*> CreateRandomRootGraph(ObjectManager* _manager, size_t _numRoots, size_t _numNodes, std::vector<Node*>& _allNodes)
 {
 	std::vector<Node*> allNodes = _allNodes;
 	allNodes.reserve(_numNodes); // 선택적 최적화
@@ -18,7 +19,6 @@ std::vector<Node*> CreateRandomRootGraph(ObjectManager* _manager, size_t _numRoo
 		// 새로운 노드 생성
 		Node* root = new Node{ "Root_" + std::to_string(i), static_cast<int>(i), {} };
 		nodeDepth[root] = 0;
-		//_manager->RegisterObject(static_cast<void*>(root), &Node::Reflection, _visited);
 		allNodes.push_back(root); // 랜덤 접근용
 		_manager->RegisterTypeDiscriptor(root->TypeName, &root->Reflection);
 	}
@@ -28,7 +28,6 @@ std::vector<Node*> CreateRandomRootGraph(ObjectManager* _manager, size_t _numRoo
 	{
 		// 새로운 노드 생성
 		Node* pNode = new Node{ "Child_" + std::to_string(i), static_cast<int>(i), {} };
-		//_manager->RegisterObject(static_cast<void*>(pNode), &Node::Reflection, _visited);
 
 		constexpr int maxTries = 5;
 		bool connected = false;
